@@ -1009,15 +1009,36 @@ const AllClients = () => {
                                                     <CTableBody>
                                                         <CTableRow>
                                                             <CTableDataCell>Sub Total</CTableDataCell>
-                                                            <CTableDataCell>2500</CTableDataCell>
+                                                            <CTableDataCell>
+                                                                <CFormInput
+                                                                    className="mb-1"
+                                                                    type="number"
+                                                                    style={{ minWidth: "100px" }}
+                                                                    aria-describedby="exampleFormControlInputHelpInline"
+                                                                />
+                                                            </CTableDataCell>
                                                         </CTableRow>
                                                         <CTableRow>
                                                             <CTableDataCell>Tax due</CTableDataCell>
-                                                            <CTableDataCell>{2500 / 100 * 18}</CTableDataCell>
+                                                            <CTableDataCell>
+                                                                <CFormInput
+                                                                    className="mb-1"
+                                                                    type="number"
+                                                                    style={{ minWidth: "100px" }}
+                                                                    aria-describedby="exampleFormControlInputHelpInline"
+                                                                />
+                                                            </CTableDataCell>
                                                         </CTableRow>
                                                         <CTableRow>
                                                             <CTableDataCell>Total Due</CTableDataCell>
-                                                            <CTableDataCell>2950</CTableDataCell>
+                                                            <CTableDataCell>
+                                                                <CFormInput
+                                                                    className="mb-1"
+                                                                    type="number"
+                                                                    style={{ minWidth: "100px" }}
+                                                                    aria-describedby="exampleFormControlInputHelpInline"
+                                                                />
+                                                            </CTableDataCell>
                                                         </CTableRow>
                                                         <CTableRow>
                                                             <CTableDataCell colSpan={2} className="text-center">MODE OF PAYMENT</CTableDataCell>
@@ -1075,7 +1096,14 @@ const AllClients = () => {
                                         </CTableRow>
                                         <CTableRow>
                                             <CTableDataCell colSpan={3}>Total</CTableDataCell>
-                                            <CTableDataCell>1300</CTableDataCell>
+                                            <CTableDataCell>
+                                                <CFormInput
+                                                    className="mb-1"
+                                                    type="number"
+                                                    style={{ minWidth: "100px" }}
+                                                    aria-describedby="exampleFormControlInputHelpInline"
+                                                />
+                                            </CTableDataCell>
                                         </CTableRow>
                                         <CTableRow>
                                             <CTableDataCell colSpan={4}>
