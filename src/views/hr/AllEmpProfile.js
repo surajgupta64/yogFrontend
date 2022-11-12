@@ -86,8 +86,7 @@ const AllEmpProfile = () => {
     }
 
     function updateRec(id, status) {
-        const data1 = { selected: status }
-
+        const data1 = { status: status }
         fetch(`${url}/employeeForm/update/${id}`, {
             method: "POST",
             headers: {
@@ -98,13 +97,10 @@ const AllEmpProfile = () => {
             body: JSON.stringify(data1)
         }).then((resp) => {
             resp.json().then(() => {
-                alert("successfully submitted")
                 getStaff()
             })
         })
     }
-
-
 
     return (
         <CRow>
@@ -180,12 +176,12 @@ const AllEmpProfile = () => {
                             <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
                                 <CTableRow >
                                     <CTableHeaderCell>Sr.No</CTableHeaderCell>
-                                    <CTableHeaderCell>Recruitment-ID</CTableHeaderCell>
-                                    <CTableHeaderCell>Apply Date</CTableHeaderCell>
                                     <CTableHeaderCell>Name</CTableHeaderCell>
                                     <CTableHeaderCell>Mobile</CTableHeaderCell>
                                     <CTableHeaderCell>Email-ID</CTableHeaderCell>
+                                    <CTableHeaderCell>Date Of Birth</CTableHeaderCell>
                                     <CTableHeaderCell>Gender</CTableHeaderCell>
+                                    <CTableHeaderCell>Employee Id</CTableHeaderCell>
                                     <CTableHeaderCell>Location</CTableHeaderCell>
                                     <CTableHeaderCell>Source</CTableHeaderCell>
                                     <CTableHeaderCell>Department</CTableHeaderCell>
@@ -213,24 +209,6 @@ const AllEmpProfile = () => {
                                     <CTableDataCell>
                                         <CFormInput
                                             className="mb-1"
-                                            style={{ minWidth: "120px" }}
-                                            type="text"
-                                            disabled
-                                            aria-describedby="exampleFormControlInputHelpInline"
-                                        />
-                                    </CTableDataCell>
-                                    <CTableDataCell>
-                                        <CFormInput
-                                            className="mb-1"
-                                            type="text"
-                                            style={{ minWidth: "120px" }}
-                                            disabled
-                                            aria-describedby="exampleFormControlInputHelpInline"
-                                        />
-                                    </CTableDataCell>
-                                    <CTableDataCell>
-                                        <CFormInput
-                                            className="mb-1"
                                             type="text"
                                             style={{ minWidth: "90px" }}
                                             value={Search1}
@@ -241,10 +219,28 @@ const AllEmpProfile = () => {
                                     <CTableDataCell>
                                         <CFormInput
                                             className="mb-1"
+                                            style={{ minWidth: "120px" }}
+                                            type="text"
+                                            disabled
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
                                             type="number"
                                             style={{ minWidth: "100px" }}
                                             value={Search10}
                                             onChange={(e) => setSearch10(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "120px" }}
+                                            disabled
                                             aria-describedby="exampleFormControlInputHelpInline"
                                         />
                                     </CTableDataCell>
@@ -384,12 +380,12 @@ const AllEmpProfile = () => {
                                     item.username === username && (
                                         <CTableRow key={index}>
                                             <CTableDataCell>{index + 1}</CTableDataCell>
-                                            <CTableDataCell>JobRec{index + 1}</CTableDataCell>
-                                            <CTableDataCell className='text-center'>{moment(item.createdAt).format("LL")}</CTableDataCell>
                                             <CTableDataCell>{item.FullName}</CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>
                                             <CTableDataCell>{item.EmailAddress}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.DateofBirth).format("MM-DD-YYYY")}</CTableDataCell>
                                             <CTableDataCell>{item.Gander}</CTableDataCell>
+                                            <CTableDataCell>{centerCode}E{index + 1}</CTableDataCell>
                                             <CTableDataCell>{item.address}</CTableDataCell>
                                             <CTableDataCell>{item.PayoutType}</CTableDataCell>
                                             <CTableDataCell>{item.Department}</CTableDataCell>
@@ -397,7 +393,7 @@ const AllEmpProfile = () => {
                                             <CTableDataCell>{item.Salary}</CTableDataCell>
                                             <CTableDataCell>{item.Grade}</CTableDataCell>
                                             <CTableDataCell>{item.Comment}</CTableDataCell>
-                                            <CTableDataCell>Selected</CTableDataCell>
+                                            <CTableDataCell>{item.status ? <><CButton className='mt-1' color='success' onClick={() => updateRec(item._id, false)} >Active</CButton></> : <CButton className='mt-1' color='danger' onClick={() => updateRec(item._id, true)}>Inactive</CButton>}</CTableDataCell>
                                             <CTableDataCell><CButton>View</CButton></CTableDataCell>
                                             <CTableDataCell className='text-center'><a href={`tel:${item.ContactNumber}`} target="_black"><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`} target="_black"><BsWhatsapp style={{ marginLeft: "4px", cursor: 'pointer', markerStart: '10px' }} size='20px' /></a><a href={`mailto: ${item.EmailAddress}`} target="_black"> <MdMail style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} size='20px' /></a></CTableDataCell>
                                             <CTableDataCell className='text-center'><MdDelete style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "5px" }} onClick={() => deleteEnquiry(item._id)} size='20px' /></CTableDataCell>

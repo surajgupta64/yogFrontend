@@ -33,7 +33,10 @@ import axios from 'axios'
 import { MdCall, MdDelete, MdEdit, MdMail } from 'react-icons/md'
 import { BsPlusCircle, BsWhatsapp } from 'react-icons/bs'
 import moment from 'moment/moment'
+import ViewInvoice from 'src/components/ViewInvoice'
+import CallUpdate from 'src/components/CallUpdate'
 const url = 'https://yog-api.herokuapp.com'
+const url2 = 'https://yoga-power-node-api.herokuapp.com'
 
 const LeftClients = () => {
     const [select, setSelect] = useState()
@@ -52,6 +55,10 @@ const LeftClients = () => {
     const [Search8, setSearch8] = useState('')
     const [Search9, setSearch9] = useState('')
     const [Search10, setSearch10] = useState('')
+    const [viewInvoice, setViewInvoice] = useState(false);
+    const [CallUpdateID, setCallUpdateID] = useState("");
+    const [Calls, setCalls] = useState(false);
+
 
     const [Name, setName] = useState("");
     const [Contact, setContact] = useState("");
@@ -107,6 +114,7 @@ const LeftClients = () => {
     const [updateItem, setUpdateItem] = useState([]);
     useEffect(() => {
         getEnquiry()
+        getStaff()
         axios.get(`${url}/subservice/all`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -120,6 +128,40 @@ const LeftClients = () => {
                 console.error(error)
             })
     }, []);
+
+    const [staff, setStaff] = useState([])
+    function getStaff() {
+        axios.get(`${url2}/employeeForm/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setStaff(res.data)
+                console.log(res.data);
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
+
+    function updateRec(id, status) {
+        const data1 = { plan: status }
+        fetch(`${url}/memberForm/update/${id}`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data1)
+        }).then((resp) => {
+            resp.json().then(() => {
+                getEnquiry()
+            })
+        })
+    }
+
 
 
     const saveEnquiry = () => {
@@ -293,16 +335,108 @@ const LeftClients = () => {
         getProspect(id)
     }
 
+    const handleCallReport = (id) => {
+        setFollowForm(id)
+        getCallReport(id)
+    }
+
     function handleEnquiry(id) {
         setEdit(id)
         getUpdate(id)
+    }
+
+    const [callReport, setCallReport] = useState(false)
+    function getCallReport(id) {
+        axios.get(`${url}/memberForm/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setUpdateItem(res.data)
+                setName(res.data.Fullname)
+                setContact(res.data.ContactNumber)
+                setServiceName1(res.data.ServiceName)
+                setCallStatus1(res.data.CallStatus)
+                setEmail(res.data.Email)
+                setCallReport(true)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
+    const saveCallReport = () => {
+        var currentdate = new Date();
+        var date = currentdate.getDay() + "-" + currentdate.getMonth()
+            + "-" + currentdate.getFullYear();
+        var time =
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes();
+        let data = {
+            username: username,
+            EnquiryID: followForm, CallDate: date, Time: time,
+            Name: Name, Contact: Contact, Email: email, ServiceName: ServiceName1, CallStatus: CallStatus1, FollowupDate: FollowupDate, TimeFollowp: TimeFollowp, Counseller: Counseller, Discussion: Discussion,
+            status: 'CallReport'
+        }
+
+        fetch(`${url}/prospect/create`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        }).then((resp) => {
+            resp.json().then(() => {
+                setCallReport(false)
+            })
+        })
+    }
+    const [invId, setinvId] = useState()
+    const [cliId, setCliId] = useState()
+    function handleInvoice(inId, clId) {
+        console.log(inId)
+        console.log(clId)
+        setinvId(null)
+        setCliId(null)
+        if (inId && clId != null) {
+            axios.get(`${url}/invoice/${inId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then((res) => {
+                    console.log(res.data)
+                    setinvId(res.data)
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+            axios.get(`${url}/memberForm/${clId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then((res) => {
+                    console.log(res.data)
+                    setCliId(res.data)
+
+                    if (invId != null && res.data != null) {
+                        setViewInvoice(true)
+                    }
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+        }
     }
     return (
         <CRow>
             <CCol lg={12} sm={12}>
                 <CCard className='mb-3 border-top-success border-top-3'>
                     <CCardHeader>
-                        <strong className="mt-2">All Clients <span className='float-end'>Total Clients : {result1.filter((list) => list.username === username).length}</span></strong>
+                        <strong className="mt-2">Left Clients <span className='float-end'>Total Left Clients : {result1.filter((list) => list.username === username && list.plan === false).length}</span></strong>
                     </CCardHeader>
                     <CCardBody>
                         <CRow className='d-flex justify-content-between'>
@@ -368,7 +502,7 @@ const LeftClients = () => {
                             </CCol>
                         </CRow>
 
-                        <CRow className='mb-3'>
+                        {/*  <CRow className='mb-3'>
                             <CCol lg={2} md={6} sm={6} className='mb-2'>
                                 <CInputGroup>
                                     <CInputGroupText
@@ -433,7 +567,143 @@ const LeftClients = () => {
                                     </CFormSelect>
                                 </CInputGroup>
                             </CCol>
-                        </CRow>
+                        </CRow> */}
+
+                        <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={callReport} color='' onClose={() => setCallReport(false)} >
+                            <CModalHeader  >
+                                <CModalTitle>Call Report</CModalTitle>
+                            </CModalHeader>
+                            <CModalBody>
+                                <CForm >
+                                    <CRow>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                type="text"
+                                                id="exampleFormControlInput1"
+                                                label="Name"
+                                                value={Name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                placeholder="Enter Name"
+                                            />
+                                        </CCol>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                type="email"
+                                                id="exampleFormControlInput1"
+                                                label="Email Address"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                placeholder="name@example.com"
+                                                aria-describedby="exampleFormControlInputHelpInline"
+                                            />
+                                        </CCol>
+
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                type="number"
+                                                value={Contact}
+                                                onChange={(e) => setContact(e.target.value)}
+                                                id="exampleFormControlInput1"
+                                                label="Contact No"
+                                                placeholder="Enter Number"
+                                            />
+                                        </CCol>
+                                        <CCol lg={6} md={6} sm={12}>
+                                            <CFormSelect
+                                                className="mb-1"
+                                                aria-label="Select Service Name"
+                                                value={ServiceName1}
+                                                onChange={(e) => setServiceName1(e.target.value)}
+                                                label="Service Name"
+
+                                            >
+                                                <option>Select Service</option>
+                                                {result.map((item, index) => (
+                                                    item.username === username && (
+                                                        item.status === true && (
+                                                            <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                        )
+                                                    )
+                                                ))}
+                                            </CFormSelect>
+                                        </CCol>
+                                        <CCol lg={6} md={6} sm={12}>
+                                            <CFormSelect
+                                                className="mb-1"
+                                                aria-label="Select Assign Staff"
+                                                value={Counseller}
+                                                onChange={(e) => setCounseller(e.target.value)}
+                                                label='Counseller'
+                                            >
+                                                <option>Select Counseller</option>
+                                                {staff.filter((list) => list.username === username && list.Department.toLowerCase() === 'sales' && list.selected === 'Select').map((item, index) => (
+                                                    item.username === username && (
+                                                        <option key={index}>{item.FullName}</option>
+                                                    )
+                                                ))}
+                                            </CFormSelect>
+                                        </CCol>
+
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormSelect
+                                                className="mb-1"
+                                                aria-label="Select Call Status"
+                                                value={CallStatus1}
+                                                onChange={(e) => setCallStatus1(e.target.value)}
+                                                label="Call Status"
+                                                options={[
+                                                    "Select",
+                                                    { label: "Cold", value: "Cold" },
+                                                    { label: "Warm", value: "Warm" },
+                                                    { label: "Hot", value: "Hot" },
+                                                ]}
+                                            />
+                                        </CCol>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                label="FollowUp Date"
+                                                type="date"
+                                                value={FollowupDate}
+                                                onChange={(e) => setFollowupDate(e.target.value)}
+                                                id="exampleFormControlInput1"
+                                            />
+                                        </CCol>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                label="FollowUp Time"
+                                                type="time"
+                                                id="exampleFormControlInput1"
+                                                value={TimeFollowp}
+                                                onChange={(e) => setTimeFollowp(e.target.value)}
+
+                                            />
+                                        </CCol>
+                                        <CCol>
+                                            <CFormTextarea
+                                                id="exampleFormControlTextarea1"
+                                                label="Discussion"
+                                                value={Discussion}
+                                                onChange={(e) => setDiscussion(e.target.value)}
+                                                rows="2"
+                                                text="Must be 8-20 words long."
+                                            ></CFormTextarea>
+                                        </CCol>
+                                    </CRow>
+                                </CForm>
+                            </CModalBody>
+                            <CModalFooter>
+                                <CButton color="secondary" onClick={() => setCallReport(false)}>
+                                    Close
+                                </CButton>
+                                <CButton type='submit' color="primary" onClick={() => saveCallReport()}>Save Call Report</CButton>
+                            </CModalFooter>
+                        </CModal>
+
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={visible} color='' onClose={() => setVisible(false)} >
                             <CModalHeader  >
                                 <CModalTitle>Prospect Form</CModalTitle>
@@ -899,6 +1169,11 @@ const LeftClients = () => {
                                 <CButton type='submit' color="primary" onClick={() => saveEnquiry()}>Update changes</CButton>
                             </CModalFooter>
                         </CModal>
+
+                        <CallUpdate add={Calls} clickfun={() => setCalls(false)} ids={CallUpdateID} />
+                        {viewInvoice &&
+                            <ViewInvoice add={viewInvoice} clickfun={() => setViewInvoice(false)} invoiceId={invId} clientId={cliId} />
+                        }
                         <CTable className='mt-3' align="middle" bordered style={{ borderColor: "#0B5345" }} hover responsive>
                             <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
                                 <CTableRow >
@@ -1075,8 +1350,7 @@ const LeftClients = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username
-
+                                    list.username === username && list.plan === false
                                     && list.Fullname.toLowerCase().includes(Search1.toLowerCase()) &&
                                     list.AttendanceID.toLowerCase().includes(Search5.toLowerCase()) && list.serviceName.toLowerCase().includes(Search6.toLowerCase()) && list.fitnessGoal.toLowerCase().includes(Search7.toLowerCase())
 
@@ -1087,17 +1361,16 @@ const LeftClients = () => {
                                             <CTableDataCell>{centerCode}MEM{index + 10}</CTableDataCell>
                                             <CTableDataCell>{item.Fullname}</CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>
-                                            <CTableDataCell>{item.InvoiceNo}</CTableDataCell>
+                                            <CTableDataCell> <label style={{ cursor: 'pointer' }} onClick={() => { setinvId(item.invoiceId), setCliId(item._id), handleInvoice(item.invoiceId, item._id) }}>{item.invoiceNum}</label> </CTableDataCell>
                                             <CTableDataCell>{item.AttendanceID}</CTableDataCell>
                                             <CTableDataCell>{item.serviceName}</CTableDataCell>
-                                            <CTableDataCell>{item.startDate}</CTableDataCell>
-                                            <CTableDataCell>{item.endDate}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.startDate).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.endDate).format("MM-DD-YYYY")}</CTableDataCell>
                                             <CTableDataCell>{item.fitnessGoal}</CTableDataCell>
                                             <CTableDataCell><CButton>View</CButton></CTableDataCell>
-                                            <CTableDataCell><CButton>View</CButton></CTableDataCell>
-                                            <CTableDataCell className='text-center'><CFormSwitch checked={item.status} /></CTableDataCell>
-
-                                            <CTableDataCell className='text-center'><a href={`tel:${item.CountryCode}${item.ContactNumber}`}><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`}><BsWhatsapp style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`}> <MdMail style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
+                                            <CTableDataCell><CButton onClick={() => { setCalls(true), setCallUpdateID(item._id) }}>View</CButton></CTableDataCell>
+                                            <CTableDataCell className='text-center'>{item.plan ? <><CButton className='mt-1' color='success' onClick={() => updateRec(item._id, false)} >Active</CButton></> : <CButton className='mt-1' color='danger' onClick={() => updateRec(item._id, true)}>Inactive</CButton>}</CTableDataCell>
+                                            <CTableDataCell className='text-center'><a href={`tel:${item.CountryCode}${item.ContactNumber}`}><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`}><BsWhatsapp style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`}> <MdMail style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
                                             <CTableDataCell className='text-center'><MdEdit id={item._id} style={{ fontSize: '35px', cursor: 'pointer', markerStart: '10px' }} onClick={() => handleEnquiry(item._id)} size='20px' /> <MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deleteEnquiry(item._id)} size='20px' /></CTableDataCell>
                                         </CTableRow>
 

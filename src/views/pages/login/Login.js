@@ -33,7 +33,6 @@ const Login = () => {
     if (email != '' || password != '') {
       setClick(true)
       setError(null)
-      console.log(email, password);
       let item = { email, password }
 
       let result = await fetch("https://yoga-power-node-api.herokuapp.com/login", {
@@ -121,7 +120,7 @@ const Login = () => {
                           </CButton>}
                       </CCol>
                       <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0 float-end" >
+                        <CButton color="link" className="px-0 float-end" onClick={() => navigate(`/forgot`)} >
                           Forgot password?
                         </CButton>
                       </CCol>

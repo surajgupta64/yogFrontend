@@ -7,6 +7,7 @@ import ProfileIcon from 'src/assets/images/avatars/profile_icon.png'
 import { storage } from 'src/firebase'
 import { v4 } from 'uuid'
 const url = 'https://yoga-power-node-api.herokuapp.com'
+const url2 = 'https://yog-api.herokuapp.com'
 
 const Recruitment = () => {
     const [error, setError] = useState('')
@@ -54,25 +55,40 @@ const Recruitment = () => {
     const username = user.user.username;
 
     useEffect(() => {
+        getLeadSource()
         getDesignation()
         getStaff()
     }, [])
-
-    const [staff, setStaff] = useState()
+    const [leadArr, setLeadArr] = useState([]);
+    function getLeadSource() {
+        axios.get(`${url2}/leadSourceMaster/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                console.log(res.data)
+                setLeadArr(res.data)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
+    const [staff, setStaff] = useState([])
     function getStaff() {
-        axios.get(`${url}/employeeForm/all`, {
+        axios.get(`${url2}/employeeForm/all`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         })
             .then((res) => {
                 setStaff(res.data)
+                console.log(res.data);
             })
             .catch((error) => {
                 console.error(error)
             })
     }
-
     const [result, setResult] = useState([])
     function getDesignation() {
         axios.get(`${url}/designation/all`, {
@@ -474,18 +490,22 @@ const Recruitment = () => {
                                             />
                                         </CCol>
                                         <CCol>
+
                                             <CFormSelect
                                                 className="mb-1"
-                                                aria-label="Select Source"
+                                                aria-label="Select Assign Staff"
                                                 value={Source}
                                                 onChange={(e) => setSource(e.target.value)}
                                                 label="Source"
-                                                options={[
-                                                    "Select Source",
-                                                    { label: "Social Media Refer", value: "Social Media Refer" },
-                                                    { label: "Employee Refer", value: "Employee Refer" },
-                                                ]}
-                                            />
+
+                                            >
+                                                <option>Select Source</option>
+                                                {leadArr.filter((list) => list.username === username).map((item, index) => (
+                                                    item.username === username && (
+                                                        <option key={index}>{item.LeadSource}</option>
+                                                    )
+                                                ))}</CFormSelect>
+
                                         </CCol>
                                     </CRow>
                                     <CRow>

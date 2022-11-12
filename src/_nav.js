@@ -139,7 +139,7 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Enquiry Appointment',
+        name: 'Appointment',
         to: '/leads/enquires-appointment',
       },
       {
@@ -171,41 +171,34 @@ const _nav = [
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
     items: [
       {
-        component: CNavGroup,
-        name: 'Clients',
-        to: '/clients/client-management',
-        items: [
-          {
-            component: CNavItem,
-            name: 'All Clients',
-            to: '/clients/client-management/all-clients',
-          },
-          {
-            component: CNavItem,
-            name: 'Active Client',
-            to: '/clients/client-management/active-clients',
-          },
-          {
-            component: CNavItem,
-            name: 'Renewals Client',
-            to: '/client-management/renewals-clients',
-          },
-          {
-            component: CNavItem,
-            name: 'Renewed Clients',
-            to: '/client-management/renewed-clients',
-          },
-          {
-            component: CNavItem,
-            name: 'Left Clients',
-            to: '/client-management/left-clients',
-          },
-          {
-            component: CNavItem,
-            name: 'Multi Service Clients',
-            to: '/client-management/multi-clients',
-          },
-        ],
+        component: CNavItem,
+        name: 'All Clients',
+        to: '/clients/client-management/all-clients',
+      },
+      {
+        component: CNavItem,
+        name: 'Active Client',
+        to: '/clients/client-management/active-clients',
+      },
+      {
+        component: CNavItem,
+        name: 'Renewals Client',
+        to: '/clients/client-management/renewals-clients',
+      },
+      {
+        component: CNavItem,
+        name: 'Renewed Clients',
+        to: '/clients/client-management/renewed-clients',
+      },
+      {
+        component: CNavItem,
+        name: 'Left Clients',
+        to: '/clients/client-management/left-clients',
+      },
+      {
+        component: CNavItem,
+        name: 'Multi Service Clients',
+        to: '/client-management/multi-clients',
       },
       {
         component: CNavItem,
@@ -374,16 +367,16 @@ const _nav = [
           {
             component: CNavItem,
             name: 'Paid Invoices',
-            to: '/base/breadcrumbs',
-          },
-          {
-            component: CNavItem,
-            name: 'Receipts',
-            to: '/base/cards',
+            to: '/finance/paid-invoice',
           },
           {
             component: CNavItem,
             name: 'Cancelled Invioces',
+            to: '/finance/cancel-invoice',
+          },
+          {
+            component: CNavItem,
+            name: 'Receipts',
             to: '/base/cards',
           },
           {
@@ -499,6 +492,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Holidays List',
+        to: '/hr/holiday-list',
+      },
+      {
+        component: CNavItem,
         name: 'Attendance Register',
         to: '/hr/attendance-register',
       },
@@ -506,11 +504,6 @@ const _nav = [
         component: CNavItem,
         name: 'Biometric Staff',
         to: '/hr/biometric-emp',
-      },
-      {
-        component: CNavItem,
-        name: 'Holidays List',
-        to: '/base/cards',
       },
       {
         component: CNavItem,
@@ -586,28 +579,23 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Marketing',
-    to: '/base',
+    to: '/master/marketing',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Lead Sources Master',
-        to: '/base/accordion',
+        to: '/master/marketing/leadSourceMaster',
       },
       {
         component: CNavItem,
         name: 'Sms, E-mail, Template Master',
-        to: '/base/breadcrumbs',
-      },
-      {
-        component: CNavItem,
-        name: 'Guest Pass Master',
-        to: '/base/cards',
+        to: '/master/marketing/emailsmsTemplate',
       },
       {
         component: CNavItem,
         name: 'Gallery Master',
-        to: '/base/cards',
+        to: '/master/marketing/galleryMaster',
       },
       {
         component: CNavItem,
@@ -624,33 +612,33 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Clients',
-    to: '/base',
+    to: '/master/clients',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
-        name: 'Cilent Transfer Master',
-        to: '/base/accordion',
+        name: 'Client Transfer Master',
+        to: '/master/clients/client-transfer',
       },
       {
         component: CNavItem,
         name: 'Appoinment Page Master',
-        to: '/base/breadcrumbs',
+        to: '/master/clients/appointment-page',
       },
       {
         component: CNavItem,
         name: 'Support & Rights Master',
-        to: '/base/cards',
+        to: '/master/clients/support-rights',
       },
       {
         component: CNavItem,
         name: 'Call Setup Master',
-        to: '/base/cards',
+        to: '/master/clients/call-setup',
       },
       {
         component: CNavItem,
         name: 'Extension',
-        to: '/base/cards',
+        to: '/master/clients/extension',
       },
     ],
   },
@@ -691,12 +679,12 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Holidays Master',
-        to: '/base/breadcrumbs',
+        to: '/master/hr/holiday',
       },
       {
         component: CNavItem,
         name: 'Payroll Master',
-        to: '/base/cards',
+        to: '/master/hr/ho',
       },
       {
         component: CNavItem,
@@ -711,7 +699,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'HR Policy',
-        to: '/base/cards',
+        to: '/master/hr/hrPolicy',
       },
       {
         component: CNavItem,
@@ -763,23 +751,28 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Finance',
-    to: '/base',
+    to: '/master/finance',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
-        name: 'Batches',
-        to: '/base/accordion',
+        name: 'Expness Category',
+        to: '/master/finance/expness',
       },
       {
         component: CNavItem,
-        name: 'PT',
-        to: '/base/breadcrumbs',
+        name: 'Budgeting',
+        to: '/master/finance/budgeting',
       },
       {
         component: CNavItem,
-        name: 'Classes',
-        to: '/base/cards',
+        name: 'Invoice Setup Master',
+        to: '/master/finance/invoice',
+      },
+      {
+        component: CNavItem,
+        name: 'Tax Setup Master',
+        to: '/master/finance/tax',
       },
     ],
   },

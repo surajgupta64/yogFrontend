@@ -1,4 +1,5 @@
-import React from 'react'
+import { cilArrowCircleTop } from "@coreui/icons";
+import CIcon from "@coreui/icons-react";
 import {
     CButton,
     CButtonGroup,
@@ -9,71 +10,113 @@ import {
     CCol,
     CFormInput,
     CFormSelect,
-    CInputGroup,
-    CInputGroupText,
+    CFormSwitch,
     CRow,
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilArrowCircleBottom, cilArrowCircleTop, cilFile, cilInfo } from '@coreui/icons'
-import { FaBeer } from 'react-icons/fa';
-import DataTable from 'src/components/DataTable'
-
+    CTable,
+    CTableBody,
+    CTableDataCell,
+    CTableHead,
+    CTableHeaderCell,
+    CTableRow,
+} from "@coreui/react";
+import axios from "axios";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { MdDelete } from "react-icons/md";
+const url = 'https://yog-api.herokuapp.com'
 
 const HolidaysList = () => {
+    const [action1, setAction1] = useState(false)
+    const [date, setDate] = useState('')
+    const [holiday, setHoliday] = useState('')
+    const [status, setStatus] = useState(false)
 
+    let user = JSON.parse(localStorage.getItem('user-info'))
+    const token = user.token;
+    const username = user.user.username;
+    const [result1, setResult1] = useState([]);
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'My-Custom-Header': 'foobar'
+    };
+    useEffect(() => {
+        getHolidayList()
+    }, []);
 
-    const header = [
+    function getHolidayList() {
+        axios.get(`${url}/holidaysListMaster/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                console.log(res.data)
+                setResult1(res.data)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
-        /* 
-        value: keyword for normal value passing
-        btn: keyword for button
-        btn1 to btn4: keyword for component passing
-        lebel: keyword for anchor tag
-        Note: please don't pass empty values or perameters
-        */
+    function createHoliday() {
+        if (holiday != '' && date != '') {
+            const data = {
+                username: username,
+                Date: date,
+                Holiday: holiday,
+                Status: status,
+            }
+            axios.post(`${url}/holidaysListMaster/create`, data, { headers })
+                .then((resp) => {
+                    console.log(resp.data)
+                    alert('Successfully Added')
+                    getHolidayList()
+                    setAction1(false)
+                    setDate('')
+                    setHoliday('')
+                    setStatus(false)
+                })
+                .catch((error) => console.log(error))
+        } else {
+            alert('enter lead Source')
+        }
+    }
 
-        { heading: 'Sr.No', value: 'id' },
-        { heading: 'Name', value: 'id' },
-        { heading: 'Mobile', value: 'date_time' },
-        { heading: 'Email Id', value: 'member_name' },
-        { heading: 'Gender', value: 'mobile' },
-        { heading: 'Address', value: 'service_name' },
-        { heading: 'Sources', value: 'variation_name' },
-        { heading: 'Exp Salary', value: 'expiry_date' },
-        { heading: 'Department', value: 'expiry_date' },
-        { heading: 'Desgantion', btn: 'renew' },
-        { heading: 'Resume', iconBtn: cilFile },
-        { heading: 'Action', com: (<> <FaBeer size='20px' /></>) },
-    ]
+    const updateStatus = (id, status) => {
+        let item = { Status: status }
+        fetch(`${url}/holidaysListMaster/update/${id}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item)
+        }).then((result) => {
+            result.json().then((resp) => {
+                getHolidayList()
+            })
+        })
+    }
 
-    const Users = [
-        {
-            id: 1,
-            date_time: "25-08-2022 03:00 PM",
-            member_name: "Nayana Nagrecha",
-            mobile: "9136123476",
-            service_name: "Yoga",
-            variation_name: "3 Months",
-            expiry_date: "31-08-2022",
-            sales_rep: "Sejal Ganatra",
-            pt_trainer: "-",
-            trainer: "Prabha Yadav",
-            staff_name: "Sejal Ganatra",
-        },
-        {
-            id: 2,
-            date_time: "25-08-2022 03:00 PM",
-            member_name: "Nayana Nagrecha",
-            mobile: "9136123476",
-            service_name: "Yoga",
-            variation_name: "3 Months",
-            expiry_date: "31-08-2022",
-            sales_rep: "Sejal Ganatra",
-            pt_trainer: "-",
-            trainer: "Prabha Yadav",
-            staff_name: "Sejal Ganatra",
-        },
-    ];
+    function deleteData(id) {
+        if (confirm('You want to delete this')) {
+            fetch(`${url}/holidaysListMaster/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then((resp) => {
+                    console.warn(resp)
+                    getHolidayList()
+                })
+            })
+        }
+        return
+    }
 
 
     return (
@@ -81,45 +124,31 @@ const HolidaysList = () => {
             <CCol lg={12} sm={12}>
                 <CCard className="mb-3 border-success">
                     <CCardHeader style={{ backgroundColor: '#0B5345', color: 'white' }}>
-                        <CCardTitle className="mt-2">Staff Check Ins</CCardTitle>
+                        <CCardTitle className="mt-2">Holiday List Master</CCardTitle>
                     </CCardHeader>
                     <CCardBody>
-                        <CRow className='d-flex mb-2'>
-                            <CCol lg={3} sm={6} className='mb-2'>
-                                <CFormSelect
-                                    id="inputGroupSelect04"
-                                    aria-label="Example select with button addon"
-                                >
-                                    <option>Name</option>
-                                    <option value="1">Location</option>
-                                    <option value="3">Mobile</option>
-                                    <option value="3">Email</option>
-                                    <option value="2">Department</option>
-                                    <option value="2">Desgantion</option>
-                                </CFormSelect>
-                            </CCol>
-
-                            <CCol lg={3} sm={6} className='mb-2'>
-                                <CFormInput
-                                    type='date'
-                                    placeholder="Search"
-                                    aria-label="Recipient's username"
-                                    aria-describedby="button-addon2"
-                                />
-                                <CButton type="button" color="primary">
-                                    Search
-                                </CButton>
-                            </CCol>
-                            <CCol lg={4} sm={6} className='mb-2' >
-                                <CButtonGroup className='float-end'>
-                                    <CButton color="primary">
-                                        <CIcon icon={cilArrowCircleTop} />
-                                        {' '}Export
-                                    </CButton>
-                                </CButtonGroup>
-                            </CCol>
-                        </CRow>
-                        <DataTable heading={header} data={Users} />
+                        <CTable className='mt-3' align="middle" bordered style={{ borderColor: "#0B5345" }} hover responsive>
+                            <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
+                                <CTableRow >
+                                    <CTableHeaderCell>Sno.</CTableHeaderCell>
+                                    <CTableHeaderCell>Date</CTableHeaderCell>
+                                    <CTableHeaderCell>Enter Holiday</CTableHeaderCell>
+                                    <CTableHeaderCell>Status</CTableHeaderCell>
+                                </CTableRow>
+                            </CTableHead>
+                            <CTableBody>
+                                {result1.filter((list) => list.username === username).map((item, index) => (
+                                    item.username === username && (
+                                        <CTableRow key={index}>
+                                            <CTableDataCell>{index + 1}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.Date).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{item.Holiday}</CTableDataCell>
+                                            <CTableDataCell className="text-center"><CFormSwitch size="xl" style={{ cursor: 'pointer' }} id={item._id} value={item.Status} checked={item.Status} onChange={() => updateStatus(item._id, !item.Status)} /></CTableDataCell>
+                                        </CTableRow>
+                                    )
+                                ))}
+                            </CTableBody>
+                        </CTable>
                     </CCardBody>
                 </CCard>
             </CCol>

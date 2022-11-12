@@ -33,9 +33,10 @@ import axios from 'axios'
 import { MdCall, MdDelete, MdEdit, MdMail } from 'react-icons/md'
 import { BsPlusCircle, BsWhatsapp } from 'react-icons/bs'
 import moment from 'moment/moment'
-import Invoice from 'src/components/Invoice'
 import CallUpdate from 'src/components/CallUpdate'
+import ViewInvoice from 'src/components/ViewInvoice'
 const url = 'https://yog-api.herokuapp.com'
+const url2 = 'https://yoga-power-node-api.herokuapp.com'
 
 const AllClients = () => {
     const [select, setSelect] = useState()
@@ -99,6 +100,7 @@ const AllClients = () => {
     const [appointmentDate, setappointmentDate] = useState("");
     const [appointmentTime, setappointmentTime] = useState("");
     const [appointmentfor, setappointmentfor] = useState("");
+    const [viewInvoice, setViewInvoice] = useState(false);
 
     const [CallUpdateID, setCallUpdateID] = useState("");
     const [Calls, setCalls] = useState(false);
@@ -114,6 +116,7 @@ const AllClients = () => {
     const [updateItem, setUpdateItem] = useState([]);
     useEffect(() => {
         getEnquiry()
+        getStaff()
         axios.get(`${url}/subservice/all`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -127,7 +130,38 @@ const AllClients = () => {
                 console.error(error)
             })
     }, []);
+    const [staff, setStaff] = useState([])
+    function getStaff() {
+        axios.get(`${url2}/employeeForm/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setStaff(res.data)
+                console.log(res.data);
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
+    function updateRec(id, status) {
+        const data1 = { plan: status }
+        fetch(`${url}/memberForm/update/${id}`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data1)
+        }).then((resp) => {
+            resp.json().then(() => {
+                getEnquiry()
+            })
+        })
+    }
 
     const saveEnquiry = () => {
         let data = {
@@ -311,7 +345,7 @@ const AllClients = () => {
                 setContact(res.data.ContactNumber)
                 setServiceName1(res.data.ServiceName)
                 setCallStatus1(res.data.CallStatus)
-                setEmail(res.data.Emailaddress)
+                setEmail(res.data.Email)
                 setVisible(true)
             })
             .catch((error) => {
@@ -335,10 +369,63 @@ const AllClients = () => {
             })
         })
     }
+    const saveCallReport = () => {
+        var currentdate = new Date();
+        var date = currentdate.getDay() + "-" + currentdate.getMonth()
+            + "-" + currentdate.getFullYear();
+        var time =
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes();
+        let data = {
+            username: username,
+            EnquiryID: followForm, CallDate: date, Time: time,
+            Name: Name, Contact: Contact, Email: email, ServiceName: ServiceName1, CallStatus: CallStatus1, FollowupDate: FollowupDate, TimeFollowp: TimeFollowp, Counseller: Counseller, Discussion: Discussion,
+            status: 'CallReport'
+        }
+
+        fetch(`${url}/prospect/create`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        }).then((resp) => {
+            resp.json().then(() => {
+                setCallReport(false)
+            })
+        })
+    }
+    const [callReport, setCallReport] = useState(false)
+    function getCallReport(id) {
+        axios.get(`${url}/memberForm/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setUpdateItem(res.data)
+                setName(res.data.Fullname)
+                setContact(res.data.ContactNumber)
+                setServiceName1(res.data.ServiceName)
+                setCallStatus1(res.data.CallStatus)
+                setEmail(res.data.Email)
+                setCallReport(true)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
     const handleFollowup = (id) => {
         setFollowForm(id)
         getProspect(id)
+    }
+
+    const handleCallReport = (id) => {
+        setFollowForm(id)
+        getCallReport(id)
     }
 
     function handleEnquiry(id) {
@@ -346,10 +433,43 @@ const AllClients = () => {
         getUpdate(id)
     }
 
-    function handleInvoice(id) {
-        setVisible3(true)
-        setEdit(id)
-        getInvoiceData(id)
+    const [invId, setinvId] = useState()
+    const [cliId, setCliId] = useState()
+    function handleInvoice(inId, clId) {
+        console.log(inId)
+        console.log(clId)
+        setinvId(null)
+        setCliId(null)
+        if (inId && clId != null) {
+            axios.get(`${url}/invoice/${inId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then((res) => {
+                    console.log(res.data)
+                    setinvId(res.data)
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+            axios.get(`${url}/memberForm/${clId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then((res) => {
+                    console.log(res.data)
+                    setCliId(res.data)
+
+                    if (invId != null && res.data != null) {
+                        setViewInvoice(true)
+                    }
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+        }
     }
 
     return (
@@ -423,7 +543,7 @@ const AllClients = () => {
                             </CCol>
                         </CRow>
 
-                        <CRow className='mb-3'>
+                        {/* <CRow className='mb-3'>
                             <CCol lg={2} md={6} sm={6} className='mb-2'>
                                 <CInputGroup>
                                     <CInputGroupText
@@ -488,8 +608,144 @@ const AllClients = () => {
                                     </CFormSelect>
                                 </CInputGroup>
                             </CCol>
-                        </CRow>
+                        </CRow> */}
                         <CallUpdate add={Calls} clickfun={() => setCalls(false)} ids={CallUpdateID} />
+
+                        <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={callReport} color='' onClose={() => setCallReport(false)} >
+                            <CModalHeader  >
+                                <CModalTitle>Call Report</CModalTitle>
+                            </CModalHeader>
+                            <CModalBody>
+                                <CForm >
+                                    <CRow>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                type="text"
+                                                id="exampleFormControlInput1"
+                                                label="Name"
+                                                value={Name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                placeholder="Enter Name"
+                                            />
+                                        </CCol>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                type="email"
+                                                id="exampleFormControlInput1"
+                                                label="Email Address"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                placeholder="name@example.com"
+                                                aria-describedby="exampleFormControlInputHelpInline"
+                                            />
+                                        </CCol>
+
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                type="number"
+                                                value={Contact}
+                                                onChange={(e) => setContact(e.target.value)}
+                                                id="exampleFormControlInput1"
+                                                label="Contact No"
+                                                placeholder="Enter Number"
+                                            />
+                                        </CCol>
+                                        <CCol lg={6} md={6} sm={12}>
+                                            <CFormSelect
+                                                className="mb-1"
+                                                aria-label="Select Service Name"
+                                                value={ServiceName1}
+                                                onChange={(e) => setServiceName1(e.target.value)}
+                                                label="Service Name"
+
+                                            >
+                                                <option>Select Service</option>
+                                                {result.map((item, index) => (
+                                                    item.username === username && (
+                                                        item.status === true && (
+                                                            <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                        )
+                                                    )
+                                                ))}
+                                            </CFormSelect>
+                                        </CCol>
+                                        <CCol lg={6} md={6} sm={12}>
+                                            <CFormSelect
+                                                className="mb-1"
+                                                aria-label="Select Assign Staff"
+                                                value={Counseller}
+                                                onChange={(e) => setCounseller(e.target.value)}
+                                                label='Counseller'
+                                            >
+                                                <option>Select Counseller</option>
+                                                {staff.filter((list) => list.username === username && list.Department.toLowerCase() === 'sales' && list.selected === 'Select').map((item, index) => (
+                                                    item.username === username && (
+                                                        <option key={index}>{item.FullName}</option>
+                                                    )
+                                                ))}
+                                            </CFormSelect>
+                                        </CCol>
+
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormSelect
+                                                className="mb-1"
+                                                aria-label="Select Call Status"
+                                                value={CallStatus1}
+                                                onChange={(e) => setCallStatus1(e.target.value)}
+                                                label="Call Status"
+                                                options={[
+                                                    "Select",
+                                                    { label: "Cold", value: "Cold" },
+                                                    { label: "Warm", value: "Warm" },
+                                                    { label: "Hot", value: "Hot" },
+                                                ]}
+                                            />
+                                        </CCol>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                label="FollowUp Date"
+                                                type="date"
+                                                value={FollowupDate}
+                                                onChange={(e) => setFollowupDate(e.target.value)}
+                                                id="exampleFormControlInput1"
+                                            />
+                                        </CCol>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormInput
+                                                className="mb-1"
+                                                label="FollowUp Time"
+                                                type="time"
+                                                id="exampleFormControlInput1"
+                                                value={TimeFollowp}
+                                                onChange={(e) => setTimeFollowp(e.target.value)}
+
+                                            />
+                                        </CCol>
+                                        <CCol>
+                                            <CFormTextarea
+                                                id="exampleFormControlTextarea1"
+                                                label="Discussion"
+                                                value={Discussion}
+                                                onChange={(e) => setDiscussion(e.target.value)}
+                                                rows="2"
+                                                text="Must be 8-20 words long."
+                                            ></CFormTextarea>
+                                        </CCol>
+                                    </CRow>
+                                </CForm>
+                            </CModalBody>
+                            <CModalFooter>
+                                <CButton color="secondary" onClick={() => setCallReport(false)}>
+                                    Close
+                                </CButton>
+                                <CButton type='submit' color="primary" onClick={() => saveCallReport()}>Save Call Report</CButton>
+                            </CModalFooter>
+                        </CModal>
+
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={visible} color='' onClose={() => setVisible(false)} >
                             <CModalHeader  >
                                 <CModalTitle>Prospect Form</CModalTitle>
@@ -954,189 +1210,9 @@ const AllClients = () => {
                                 <CButton type='submit' color="primary" onClick={() => saveEnquiry()}>Update changes</CButton>
                             </CModalFooter>
                         </CModal>
-
-                        <CModal size="xl" alignment="center" scrollable visible={visible2} onClose={() => setVisible2(false)}>
-                            <CModalHeader>
-                                <CModalTitle>Invoice</CModalTitle>
-                            </CModalHeader>
-                            <CModalBody>
-                                <CRow>
-                                    <CCol lg={12} className='text-center'><h4>Invoice</h4></CCol>
-                                    <CCol>
-                                        Yog Power Studio<br />
-                                        kandivali east mumbai<br />
-                                        Name : {Fullname} <br />
-                                        Phone : {ContactNumber} <br />
-                                    </CCol>
-                                    <CCol>
-                                        Customer id : {AttendanceID}<br />
-                                        Invoice No : {centerCode}INV{result1.length} <br />
-                                        <CRow>
-                                            <CCol lg={3}>Sales Rep :
-                                            </CCol><CCol>
-                                                <CFormInput
-                                                    className="mb-1"
-                                                    type="text"
-                                                    style={{ minWidth: "100px" }}
-                                                    aria-describedby="exampleFormControlInputHelpInline"
-                                                />
-                                            </CCol>
-                                            <CCol></CCol>
-                                        </CRow>
-                                    </CCol>
-                                </CRow>
-                                <CTable className='mt-3' align="middle" bordered style={{ borderColor: "#0B5345" }} hover responsive>
-                                    <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
-                                        <CTableRow >
-                                            <CTableHeaderCell>Sr.No</CTableHeaderCell>
-                                            <CTableHeaderCell>DESCRIPTION</CTableHeaderCell>
-                                            <CTableHeaderCell>DURATION</CTableHeaderCell>
-                                            <CTableHeaderCell>SERVICE FEE</CTableHeaderCell>
-                                        </CTableRow>
-                                    </CTableHead>
-                                    <CTableBody>
-                                        <CTableRow>
-                                            <CTableDataCell>1</CTableDataCell>
-                                            <CTableDataCell>yoga</CTableDataCell>
-                                            <CTableDataCell>3 month</CTableDataCell>
-                                            <CTableDataCell>2500</CTableDataCell>
-                                        </CTableRow>
-
-                                        <CTableRow>
-                                            <CTableDataCell colSpan={2}></CTableDataCell>
-                                            <CTableDataCell colSpan={2}>
-                                                <CTable bordered style={{ margin: '0', padding: '0' }} responsive>
-                                                    <CTableBody>
-                                                        <CTableRow>
-                                                            <CTableDataCell>Sub Total</CTableDataCell>
-                                                            <CTableDataCell>
-                                                                <CFormInput
-                                                                    className="mb-1"
-                                                                    type="number"
-                                                                    style={{ minWidth: "100px" }}
-                                                                    aria-describedby="exampleFormControlInputHelpInline"
-                                                                />
-                                                            </CTableDataCell>
-                                                        </CTableRow>
-                                                        <CTableRow>
-                                                            <CTableDataCell>Tax due</CTableDataCell>
-                                                            <CTableDataCell>
-                                                                <CFormInput
-                                                                    className="mb-1"
-                                                                    type="number"
-                                                                    style={{ minWidth: "100px" }}
-                                                                    aria-describedby="exampleFormControlInputHelpInline"
-                                                                />
-                                                            </CTableDataCell>
-                                                        </CTableRow>
-                                                        <CTableRow>
-                                                            <CTableDataCell>Total Due</CTableDataCell>
-                                                            <CTableDataCell>
-                                                                <CFormInput
-                                                                    className="mb-1"
-                                                                    type="number"
-                                                                    style={{ minWidth: "100px" }}
-                                                                    aria-describedby="exampleFormControlInputHelpInline"
-                                                                />
-                                                            </CTableDataCell>
-                                                        </CTableRow>
-                                                        <CTableRow>
-                                                            <CTableDataCell colSpan={2} className="text-center">MODE OF PAYMENT</CTableDataCell>
-                                                        </CTableRow>
-                                                        <CTableRow>
-                                                            <CTableDataCell>
-                                                                <CFormSelect
-                                                                    className="mb-1"
-                                                                    aria-label="Select Call Status"
-                                                                    style={{ minWidth: "100px" }}
-                                                                    options={[
-                                                                        "Select",
-                                                                        { label: "Cash", value: "Cash" },
-                                                                        { label: "Debit Card", value: "Debit Card" },
-                                                                        { label: "Credit Card", value: "Credit Card" },
-                                                                        { label: "Cheque", value: "Cheque" },
-                                                                        { label: "Draft", value: "Draft" },
-                                                                    ]}
-                                                                />
-                                                            </CTableDataCell>
-                                                            <CTableDataCell>
-                                                                <CFormInput
-                                                                    className="mb-1"
-                                                                    type="number"
-                                                                    style={{ minWidth: "100px" }}
-                                                                    aria-describedby="exampleFormControlInputHelpInline"
-                                                                />
-                                                            </CTableDataCell>
-                                                        </CTableRow>
-                                                        <CTableRow>
-                                                            <CTableDataCell>Pending</CTableDataCell>
-                                                            <CTableDataCell>
-                                                                <CFormInput
-                                                                    className="mb-1"
-                                                                    type="number"
-                                                                    style={{ minWidth: "100px" }}
-                                                                    aria-describedby="exampleFormControlInputHelpInline"
-                                                                />
-                                                            </CTableDataCell>
-                                                        </CTableRow>
-                                                        <CTableRow>
-                                                            <CTableDataCell>Discount</CTableDataCell>
-                                                            <CTableDataCell>
-                                                                <CFormInput
-                                                                    className="mb-1"
-                                                                    type="number"
-                                                                    style={{ minWidth: "100px" }}
-                                                                    aria-describedby="exampleFormControlInputHelpInline"
-                                                                />
-                                                            </CTableDataCell>
-                                                        </CTableRow>
-                                                    </CTableBody>
-                                                </CTable>
-                                            </CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-                                            <CTableDataCell colSpan={3}>Total</CTableDataCell>
-                                            <CTableDataCell>
-                                                <CFormInput
-                                                    className="mb-1"
-                                                    type="number"
-                                                    style={{ minWidth: "100px" }}
-                                                    aria-describedby="exampleFormControlInputHelpInline"
-                                                />
-                                            </CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-                                            <CTableDataCell colSpan={4}>
-                                                <h5>TERMS AND CONDITIONS</h5>
-                                            </CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-
-                                            <CTableDataCell colSpan={4}>
-                                                <label>* Fee once paid is not refundable, Non transferable.</label>
-                                                <label>   * Extension of the packages is not allowed. You have to adjust your lapsed sessions within the expiry date.</label>
-                                                <label>
-                                                    * Instructors and timings are subject to change.
-                                                </label>
-                                                <label>*All packages would be on hourly basis in a day.</label>
-                                                <label>
-                                                    * If a person wishes to workout more than an hour in a day, kindly upgrade your package accordingly.</label>
-                                                <label>
-                                                    * For effective results follow the guidelines compulsory.
-                                                </label>
-                                            </CTableDataCell>
-                                        </CTableRow>
-                                    </CTableBody>
-                                </CTable>
-
-                            </CModalBody>
-                            <CModalFooter>
-                                <CButton color="secondary" onClick={() => setVisible2(false)}>
-                                    Close
-                                </CButton>
-                                <CButton color="primary">Save changes</CButton>
-                            </CModalFooter>
-                        </CModal>
+                        {viewInvoice &&
+                            <ViewInvoice add={viewInvoice} clickfun={() => setViewInvoice(false)} invoiceId={invId} clientId={cliId} />
+                        }
                         <CTable className='mt-3' align="middle" bordered style={{ borderColor: "#0B5345" }} hover responsive>
                             <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
                                 <CTableRow >
@@ -1315,10 +1391,8 @@ const AllClients = () => {
                                 </CTableRow>
                                 {result1.filter((list) =>
                                     list.username === username
-
                                     && list.Fullname.toLowerCase().includes(Search1.toLowerCase()) &&
                                     list.AttendanceID.toLowerCase().includes(Search5.toLowerCase()) && list.serviceName.toLowerCase().includes(Search6.toLowerCase()) && list.fitnessGoal.toLowerCase().includes(Search7.toLowerCase())
-
                                 ).map((item, index) => (
                                     item.username === username && (
                                         <CTableRow key={index}>
@@ -1326,16 +1400,16 @@ const AllClients = () => {
                                             <CTableDataCell>{centerCode}MEM{index + 10}</CTableDataCell>
                                             <CTableDataCell>{item.Fullname}</CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>
-                                            <CTableDataCell> <label style={{ cursor: 'pointer' }} onClick={() => handleInvoice(item._id)}>{item.invoice}View</label> </CTableDataCell>
+                                            <CTableDataCell> <label style={{ cursor: 'pointer' }} onClick={() => { setinvId(item.invoiceId), setCliId(item._id), handleInvoice(item.invoiceId, item._id) }}>{item.invoiceNum}</label> </CTableDataCell>
                                             <CTableDataCell>{item.AttendanceID}</CTableDataCell>
                                             <CTableDataCell>{item.serviceName}</CTableDataCell>
-                                            <CTableDataCell>{item.startDate}</CTableDataCell>
-                                            <CTableDataCell>{item.endDate}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.startDate).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.endDate).format("MM-DD-YYYY")}</CTableDataCell>
                                             <CTableDataCell>{item.fitnessGoal}</CTableDataCell>
                                             <CTableDataCell><CButton>View</CButton></CTableDataCell>
                                             <CTableDataCell><CButton onClick={() => { setCalls(true), setCallUpdateID(item._id) }}>View</CButton></CTableDataCell>
-                                            <CTableDataCell className='text-center'><CFormSwitch checked={item.status} /></CTableDataCell>
-                                            <CTableDataCell className='text-center'><a href={`tel:${item.CountryCode}${item.ContactNumber}`}><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`}><BsWhatsapp style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`}> <MdMail style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
+                                            <CTableDataCell className='text-center'>{item.plan ? <><CButton className='mt-1' color='success' onClick={() => updateRec(item._id, false)} >Active</CButton></> : <CButton className='mt-1' color='danger' onClick={() => updateRec(item._id, true)}>Inactive</CButton>}</CTableDataCell>
+                                            <CTableDataCell className='text-center'><a href={`tel:${item.CountryCode}${item.ContactNumber}`}><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`}><BsWhatsapp style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`}> <MdMail style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
                                             <CTableDataCell className='text-center'><MdEdit id={item._id} style={{ fontSize: '35px', cursor: 'pointer', markerStart: '10px' }} onClick={() => handleEnquiry(item._id)} size='20px' /> <MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deleteEnquiry(item._id)} size='20px' /></CTableDataCell>
                                         </CTableRow>
                                     )

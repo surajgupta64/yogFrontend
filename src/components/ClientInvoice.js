@@ -1,10 +1,10 @@
 import { CButton, CCol, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow, CTable, CTableBody, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react'
 import React from 'react'
 
-const Invoice = () => {
+const ClientInvoice = ({ add, clickfun, ids }) => {
 
     return (
-        <CModal size="xl" alignment="center" scrollable visible={visible2} onClose={() => setVisible2(false)}>
+        <CModal size="xl" alignment="center" scrollable visible={add} onClose={clickfun}>
             <CModalHeader>
                 <CModalTitle>Invoice</CModalTitle>
             </CModalHeader>
@@ -58,15 +58,36 @@ const Invoice = () => {
                                     <CTableBody>
                                         <CTableRow>
                                             <CTableDataCell>Sub Total</CTableDataCell>
-                                            <CTableDataCell>2500</CTableDataCell>
+                                            <CTableDataCell>
+                                                <CFormInput
+                                                    className="mb-1"
+                                                    type="number"
+                                                    style={{ minWidth: "100px" }}
+                                                    aria-describedby="exampleFormControlInputHelpInline"
+                                                />
+                                            </CTableDataCell>
                                         </CTableRow>
                                         <CTableRow>
                                             <CTableDataCell>Tax due</CTableDataCell>
-                                            <CTableDataCell>{2500 / 100 * 18}</CTableDataCell>
+                                            <CTableDataCell>
+                                                <CFormInput
+                                                    className="mb-1"
+                                                    type="number"
+                                                    style={{ minWidth: "100px" }}
+                                                    aria-describedby="exampleFormControlInputHelpInline"
+                                                />
+                                            </CTableDataCell>
                                         </CTableRow>
                                         <CTableRow>
                                             <CTableDataCell>Total Due</CTableDataCell>
-                                            <CTableDataCell>2950</CTableDataCell>
+                                            <CTableDataCell>
+                                                <CFormInput
+                                                    className="mb-1"
+                                                    type="number"
+                                                    style={{ minWidth: "100px" }}
+                                                    aria-describedby="exampleFormControlInputHelpInline"
+                                                />
+                                            </CTableDataCell>
                                         </CTableRow>
                                         <CTableRow>
                                             <CTableDataCell colSpan={2} className="text-center">MODE OF PAYMENT</CTableDataCell>
@@ -124,7 +145,14 @@ const Invoice = () => {
                         </CTableRow>
                         <CTableRow>
                             <CTableDataCell colSpan={3}>Total</CTableDataCell>
-                            <CTableDataCell>1300</CTableDataCell>
+                            <CTableDataCell>
+                                <CFormInput
+                                    className="mb-1"
+                                    type="number"
+                                    style={{ minWidth: "100px" }}
+                                    aria-describedby="exampleFormControlInputHelpInline"
+                                />
+                            </CTableDataCell>
                         </CTableRow>
                         <CTableRow>
                             <CTableDataCell colSpan={4}>
@@ -132,19 +160,13 @@ const Invoice = () => {
                             </CTableDataCell>
                         </CTableRow>
                         <CTableRow>
-
                             <CTableDataCell colSpan={4}>
                                 <label>* Fee once paid is not refundable, Non transferable.</label>
-                                <label>   * Extension of the packages is not allowed. You have to adjust your lapsed sessions within the expiry date.</label>
-                                <label>
-                                    * Instructors and timings are subject to change.
-                                </label>
-                                <label>*All packages would be on hourly basis in a day.</label>
-                                <label>
-                                    * If a person wishes to workout more than an hour in a day, kindly upgrade your package accordingly.</label>
-                                <label>
-                                    * For effective results follow the guidelines compulsory.
-                                </label>
+                                <label>* Extension of the packages is not allowed. You have to adjust your lapsed sessions within the expiry date.</label>
+                                <label>* Instructors and timings are subject to change.</label>
+                                <label>* All packages would be on hourly basis in a day.</label>
+                                <label>* If a person wishes to workout more than an hour in a day, kindly upgrade your package accordingly.</label>
+                                <label>* For effective results follow the guidelines compulsory.</label>
                             </CTableDataCell>
                         </CTableRow>
                     </CTableBody>
@@ -161,4 +183,4 @@ const Invoice = () => {
     )
 }
 
-export default Invoice
+export default ClientInvoice

@@ -11,6 +11,7 @@ const CallUpdate = ({ add, clickfun, ids }) => {
     let user = JSON.parse(localStorage.getItem('user-info'))
     console.log(user);
     const token = user.token;
+    console.log(ids);
     useEffect(() => {
         axios.get(`${url}/prospect/all`, {
             headers: {
@@ -43,7 +44,6 @@ const CallUpdate = ({ add, clickfun, ids }) => {
                             <CTableHeaderCell>Time</CTableHeaderCell>
                             <CTableDataCell>Discussion</CTableDataCell>
                             <CTableHeaderCell>Counseller</CTableHeaderCell>
-                            <CTableHeaderCell>Action</CTableHeaderCell>
                         </CTableRow>
                     </CTableHead>
                     <CTableBody>
@@ -59,7 +59,6 @@ const CallUpdate = ({ add, clickfun, ids }) => {
                                 <CTableDataCell>{moment(item.Time, "HH:mm").format("hh:mm A")}</CTableDataCell>
                                 <CTableDataCell>{item.Discussion}</CTableDataCell>
                                 <CTableDataCell>{item.Counseller}</CTableDataCell>
-                                <CTableDataCell className='text-center'><a href={`tel:${item.Contact}`} target="_black" ><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a><a href={`https://wa.me/${item.Contact}`} target="_black" ><BsWhatsapp style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a><a href={`mailto: ${item.Email}`} target="_black"> <MdMail style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' /></a> </CTableDataCell>
                             </CTableRow>
                         ))}
                     </CTableBody>

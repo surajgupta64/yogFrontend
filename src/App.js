@@ -1,6 +1,7 @@
 import React, { Component, Suspense } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import './scss/style.scss'
+import Forgot from './views/pages/forgot/Forgot'
 
 const loading = (
   <div className="pt-3 text-center">
@@ -24,6 +25,7 @@ class App extends Component {
         <Suspense fallback={loading}>
           <Routes>
             <Route exact path="/login" name="Login Page" element={<Login />} />
+            <Route exact path="/forgot" name="Forgot Page" element={<Forgot />} />
             <Route
               exact
               path="/register"

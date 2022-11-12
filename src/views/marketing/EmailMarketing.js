@@ -21,13 +21,14 @@ const EmailMarketing = () => {
                                 ]}
                             />
                         </CCol>
+
                         <CCol lg={6} md={6} sm={12}>
                             <CFormInput
                                 className="mb-1"
                                 type="text"
                                 id="exampleFormControlInput1"
                                 label="Subject"
-                                placeholder="Enter height"
+                                placeholder="Enter Subject"
                             />
                         </CCol>
                         <CCol lg={12} md={12} sm={12}>

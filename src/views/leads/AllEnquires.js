@@ -34,9 +34,17 @@ import { BsPlusCircle, BsWhatsapp } from 'react-icons/bs'
 import moment from 'moment/moment'
 import AdmissionForm1 from 'src/components/AdmissionForm1'
 const url = 'https://yog-api.herokuapp.com'
+const url2 = 'https://yoga-power-node-api.herokuapp.com'
 
 const AllEnquires = () => {
-    const [select, setSelect] = useState()
+
+    var currentdate = new Date();
+    var day = currentdate.getDay();
+    var month = currentdate.getMonth();
+    var year = currentdate.getFullYear();
+    console.log(month + 1);
+    console.log(day);
+    const [select, setSelect] = useState('')
     const [followForm, setFollowForm] = useState()
     const [edit, setEdit] = useState()
     const [visible1, setVisible1] = useState(false)
@@ -110,9 +118,11 @@ const AllEnquires = () => {
     const [result1, setResult1] = useState([]);
     console.log(token);
     const [result, setResult] = useState([]);
+    const [packageArr, setPackageArr] = useState([]);
     const [updateItem, setUpdateItem] = useState([]);
     useEffect(() => {
         getEnquiry()
+        getStaff()
         axios.get(`${url}/subservice/all`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -127,6 +137,21 @@ const AllEnquires = () => {
             })
     }, []);
 
+    const [staff, setStaff] = useState([])
+    function getStaff() {
+        axios.get(`${url2}/employeeForm/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setStaff(res.data)
+                console.log(res.data);
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
     const saveEnquiry = () => {
         let data = {
@@ -222,7 +247,7 @@ const AllEnquires = () => {
             body: JSON.stringify(data)
         }).then((resp) => {
             resp.json().then(() => {
-                setVisible(false)
+                setCallReport(false)
             })
         })
         const data1 = { Counseller }
@@ -383,9 +408,10 @@ const AllEnquires = () => {
                                         value={select}
                                         onChange={(e) => setSelect(e.target.value)}
                                     >
-                                        <option>Today</option>
+                                        <option value={day - 1}>Today</option>
                                         <option>Last Week</option>
-                                        <option>Last Month</option>
+                                        <option value={month + 1}>Last Month</option>
+                                        <option value={year}>This Year</option>
                                         <option>Custom Date</option>
                                     </CFormSelect>
                                     {select === 'Custom Date' && (
@@ -460,7 +486,7 @@ const AllEnquires = () => {
                                         <CCard style={{ margin: "2px" }}>
                                             <CCardBody style={{ padding: "5px" }}>
                                                 Cold: {result1.filter((list) =>
-                                                    list.username === username && list.status === 'Lost'
+                                                    list.username === username && list.CallStatus === 'Cold'
                                                 ).length}
                                             </CCardBody>
                                         </CCard>
@@ -483,14 +509,14 @@ const AllEnquires = () => {
                                         <CCard style={{ margin: "2px" }}>
                                             <CCardBody style={{ padding: "5px" }}>
                                                 Trial: {result1.filter((list) =>
-                                                    list.username === username && list.status === 'Trails'
+                                                    list.username === username && list.appointmentfor === 'Trial Session'
                                                 ).length}
                                             </CCardBody>
                                         </CCard>
                                         <CCard style={{ margin: "2px" }}>
                                             <CCardBody style={{ padding: "5px" }}>
                                                 Appointment: {result1.filter((list) =>
-                                                    list.username === username && list.status === 'PostTrail'
+                                                    list.username === username && list.appointmentfor === 'Appointment'
                                                 ).length}
                                             </CCardBody>
                                         </CCard>
@@ -528,7 +554,7 @@ const AllEnquires = () => {
                                 </CCard>
                             </CCol>
                         </CRow>
-                        <CRow className='mb-3'>
+                        {/* <CRow className='mb-3'>
                             <CCol lg={2} md={6} sm={6} className='mb-2'>
                                 <CInputGroup>
                                     <CInputGroupText
@@ -588,7 +614,7 @@ const AllEnquires = () => {
                                     </CFormSelect>
                                 </CInputGroup>
                             </CCol>
-                        </CRow>
+                        </CRow> */}
                         <AdmissionForm1 add={admissionForm} clickfun={() => setAdmissionForm(false)} ids={edit} />
 
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={callReport} color='' onClose={() => setCallReport(false)} >
@@ -653,15 +679,20 @@ const AllEnquires = () => {
                                             </CFormSelect>
                                         </CCol>
                                         <CCol lg={6} md={6} sm={12}>
-                                            <CFormInput
+                                            <CFormSelect
                                                 className="mb-1"
-                                                type="text"
+                                                aria-label="Select Assign Staff"
                                                 value={Counseller}
                                                 onChange={(e) => setCounseller(e.target.value)}
-                                                id="exampleFormControlInput1"
-                                                label="Counseller"
-                                                placeholder="Enter Counseller Name"
-                                            />
+                                                label='Counseller'
+                                            >
+                                                <option>Select Counseller</option>
+                                                {staff.filter((list) => list.username === username && list.Department.toLowerCase() === 'sales' && list.selected === 'Select').map((item, index) => (
+                                                    item.username === username && (
+                                                        <option key={index}>{item.FullName}</option>
+                                                    )
+                                                ))}
+                                            </CFormSelect>
                                         </CCol>
 
                                         <CCol lg={4} md={6} sm={12}>
@@ -1187,7 +1218,7 @@ const AllEnquires = () => {
                             </CModalFooter>
                         </CModal>
                         <CTable className='mt-3' align="middle" bordered style={{ borderColor: "#0B5345" }} hover responsive>
-                            <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
+                            <CTableHead style={{ backgroundColor: "#0B5345", color: "white", tableLayout: 'fixed', borderCollapse: 'collapse', top: '0' }} >
                                 <CTableRow >
                                     <CTableHeaderCell>Sr.No</CTableHeaderCell>
                                     <CTableHeaderCell>Enquiry ID</CTableHeaderCell>
@@ -1200,7 +1231,8 @@ const AllEnquires = () => {
                                     <CTableHeaderCell>Enquiry stage</CTableHeaderCell>
                                     <CTableHeaderCell>Call Status</CTableHeaderCell>
                                     <CTableHeaderCell>Last Call</CTableHeaderCell>
-                                    <CTableHeaderCell>Addmission</CTableHeaderCell>
+                                    <CTableHeaderCell>Add</CTableHeaderCell>
+                                    <CTableHeaderCell>Appointment Date & Time</CTableHeaderCell>
                                     <CTableHeaderCell>Assigned by</CTableHeaderCell>
                                     <CTableHeaderCell>Counseller</CTableHeaderCell>
                                     <CTableHeaderCell>Action</CTableHeaderCell>
@@ -1232,7 +1264,6 @@ const AllEnquires = () => {
                                             className="mb-1"
                                             type="text"
                                             style={{ minWidth: "120px" }}
-                                            disabled
                                             value={Search1}
                                             onChange={(e) => setSearch1(e.target.value)}
                                             aria-describedby="exampleFormControlInputHelpInline"
@@ -1330,6 +1361,15 @@ const AllEnquires = () => {
                                     <CTableDataCell>
                                         <CFormInput
                                             className="mb-1"
+                                            style={{ minWidth: "50px" }}
+                                            type="text"
+                                            disabled
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
                                             type="text"
                                             style={{ minWidth: "100px" }}
                                             value={Search9}
@@ -1343,6 +1383,7 @@ const AllEnquires = () => {
                                             type="text"
                                             value={Search10}
                                             style={{ minWidth: "100px" }}
+                                            disabled
                                             onChange={(e) => setSearch10(e.target.value)}
                                             aria-describedby="exampleFormControlInputHelpInline"
                                         />
@@ -1367,15 +1408,15 @@ const AllEnquires = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
+                                    list.username === username && moment(list.appointmentDate).format("MM-DD-YYYY").includes(select) && moment(list.appointmentDate).format("MM-DD-YYYY").includes(Search1) && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
                                     list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
                                 ).map((item, index) => (
                                     item.username === username && (
                                         <CTableRow key={index}>
                                             <CTableDataCell>{index + 1}</CTableDataCell>
-                                            <CTableDataCell>{centerCode}ENQ{index + 10}</CTableDataCell>
-                                            <CTableDataCell className='text-center'>{moment(item.appointmentDate).format("LL")}</CTableDataCell>
-                                            <CTableDataCell>{moment(item.appointmentTime, "HH:mm").format("hh:mm A")}</CTableDataCell>
+                                            <CTableDataCell>{centerCode}Q{index + 10}</CTableDataCell>
+                                            <CTableDataCell className='text-center'>{moment(item.createdAt).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.createdAt, "HH:mm").format("hh:mm A")}</CTableDataCell>
                                             <CTableDataCell>{item.Fullname}</CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>
                                             <CTableDataCell>{item.ServiceName}</CTableDataCell>
@@ -1383,13 +1424,13 @@ const AllEnquires = () => {
                                             <CTableDataCell>{item.appointmentfor}</CTableDataCell>
                                             <CTableDataCell>{item.CallStatus}</CTableDataCell>
                                             <CTableDataCell>{item.Message}</CTableDataCell>
-                                            <CTableDataCell><label onClick={() => { setAdmissionForm(true), setEdit(item._id) }}>Member Form</label></CTableDataCell>
+                                            <CTableDataCell><BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => { setAdmissionForm(true), setEdit(item._id) }} /></CTableDataCell>
+                                            <CTableDataCell>{moment(item.appointmentDate).format("MM-DD-YYYY") != 'Invalid date' && moment(item.appointmentDate).format("MM-DD-YYYY")}<br />{moment(item.appointmentTime, "HH:mm").format("hh:mm A") != 'Invalid date' ? moment(item.appointmentTime, "HH:mm").format("hh:mm A") : '-'}</CTableDataCell>
                                             <CTableDataCell>{item.StaffName}</CTableDataCell>
                                             <CTableDataCell>{item.Counseller}</CTableDataCell>
                                             <CTableDataCell className='text-center'><a href={`tel:+${item.CountryCode}${item.ContactNumber}`} target="_black"><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`} target="_black"><BsWhatsapp style={{ marginLeft: "4px", cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`} target="_black"> <MdMail style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
                                             <CTableDataCell className='text-center'><MdEdit id={item._id} style={{ fontSize: '35px', cursor: 'pointer', markerStart: '10px' }} onClick={() => handleEnquiry(item._id)} size='20px' /> <MdDelete style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "5px" }} onClick={() => deleteEnquiry(item._id)} size='20px' /></CTableDataCell>
                                         </CTableRow>
-
                                     )
                                 ))}
                             </CTableBody>

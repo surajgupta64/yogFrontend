@@ -14,11 +14,13 @@ import {
 import axios from "axios";
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { CountryList } from "src/components/CountryList";
 const url = 'https://yog-api.herokuapp.com'
+const url2 = 'https://yoga-power-node-api.herokuapp.com'
 
 
-const EnquiryForm = (props) => {
+const EnquiryForm = () => {
     const [Fullname, setFullName] = useState("");
     const [Emailaddress, setEmailAddress] = useState("");
     const [CountryCode, setCountryCode] = useState("");
@@ -29,22 +31,17 @@ const EnquiryForm = (props) => {
     const [Area, setArea] = useState("");
     const [city, setCity] = useState("");
     const [Profession, setProfession] = useState("");
-
-
     const [StaffName, setStaffName] = useState("");
     const [CenterName, setCenterName] = useState("");
     const [CallStatus, setCallStatus] = useState("");
     const [Message, setMessage] = useState("");
-
-
     const [person_Name, setperson_Name] = useState("");
     const [Relation, setRelation] = useState("");
     const [CountryCode2, setCountryCode2] = useState("");
     const [ContactNumber2, setContactNumber2] = useState("");
-
-
     const [EnquiryDate, setEnquiryDate] = useState("");
     const [ServiceName, setServiceName] = useState("");
+    const [ServiceVariation, setServiceVariation] = useState("");
     const [Customertype, setCustomertype] = useState("");
     const [enquirytype, setEnquirytype] = useState("");
     const [appointmentDate, setappointmentDate] = useState("");
@@ -52,12 +49,19 @@ const EnquiryForm = (props) => {
     const [appointmentfor, setappointmentfor] = useState("");
     const [counseller, setCounseller] = useState("");
 
+    const navigate = useNavigate()
     let user = JSON.parse(localStorage.getItem('user-info'))
+    console.log(user);
     const token = user.token;
     const username = user.user.username;
-    console.log(token);
     const [result, setResult] = useState([]);
+    const [serviceArr, setServiceArr] = useState([]);
+    const [result1, setResult1] = useState([]);
+    const [leadArr, setLeadArr] = useState([]);
+    const [mem, setMem] = useState([]);
     useEffect(() => {
+        getStaff()
+        getLeadSource()
         axios.get(`${url}/subservice/all`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -70,39 +74,73 @@ const EnquiryForm = (props) => {
             .catch((error) => {
                 console.error(error)
             })
+
+        axios.get(`${url}/enquiryForm/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                console.log(res.data)
+                setResult1(res.data)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+
     }, []);
-    console.log(result);
-    console.log(DateofBirth);
-    console.log(EnquiryDate);
-    const saveEnquiry = (e) => {
+
+    function getLeadSource() {
+        axios.get(`${url}/leadSourceMaster/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                console.log(res.data)
+                setLeadArr(res.data)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
+    const [staff, setStaff] = useState([])
+    function getStaff() {
+        axios.get(`${url2}/employeeForm/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setStaff(res.data)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
+
+    const saveEnquiry = () => {
         let data = {
             username: username,
             Fullname, Emailaddress, CountryCode, ContactNumber, Gander, DateofBirth, address, Area, city, Profession,
             StaffName, CenterName, CallStatus, Message,
-            person_Name, Relation, CountryCode2, ContactNumber2: ContactNumber2,
-            EnquiryDate, ServiceName, Customertype, enquirytype, appointmentDate, appointmentTime, appointmentfor: appointmentfor, Counseller: counseller, status: "all_enquiry",
+            person_Name, Relation, CountryCode2: CountryCode2, ContactNumber2: ContactNumber2,
+            EnquiryDate, ServiceName, ServiceVariation, Customertype, enquirytype, appointmentDate, appointmentTime, appointmentfor: appointmentfor, Counseller: counseller, status: "all_enquiry",
         }
 
-        fetch(`${url}/enquiryForm/create`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        }).then((resp) => {
-            resp.json().then(() => {
-                console.log(resp);
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'My-Custom-Header': 'foobar'
+        }
+        axios.post(`${url}/enquiryForm/create`, data, { headers })
+            .then((resp) => {
+                console.log(resp)
                 alert("successfully submitted")
-                e.preventDefault();
-                setFullName('')
+                console.log("refresh prevented");
                 setEmailAddress('')
+                setFullName('')
                 setCountryCode('')
                 setContactNumber('')
-                setGander('')
-                setDateofBirth('')
-                setAddress('')
                 setArea('')
                 setCity('')
                 setProfession('')
@@ -110,21 +148,18 @@ const EnquiryForm = (props) => {
                 setCenterName('')
                 setCallStatus('')
                 setMessage('')
-                setperson_Name('')
                 setRelation('')
+                setGander('')
                 setCountryCode2('')
                 setContactNumber2('')
-                setEnquiryDate('')
-                setServiceName('')
-                setCustomertype('')
-                setEnquirytype('')
                 setappointmentDate('')
                 setappointmentTime('')
                 setappointmentfor('')
+                setCounseller('')
             })
-        }).catch((error) => {
-            console.log(error);
-        })
+            .catch((error) =>
+                console.error(error)
+            )
     }
 
     return (
@@ -133,7 +168,7 @@ const EnquiryForm = (props) => {
                 <CCardTitle>Enquiry Form</CCardTitle>
             </CCardHeader>
             <CCardBody>
-                <CForm onSubmit={saveEnquiry}>
+                <CForm>
                     <CRow>
                         <CCol lg={6} sm={12}>
                             <CCardTitle>Personal Details</CCardTitle>
@@ -142,6 +177,7 @@ const EnquiryForm = (props) => {
                                     <CFormInput
                                         className="mb-1"
                                         type="text"
+                                        name="name"
                                         id="exampleFormControlInput1"
                                         label="Full name"
                                         value={Fullname}
@@ -399,7 +435,29 @@ const EnquiryForm = (props) => {
                                         {result.map((item, index) => (
                                             item.username === username && (
                                                 item.status === true && (
-                                                    <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                    <option key={index}>{item.selected_service}</option>
+                                                )
+                                            )
+                                        ))}
+                                    </CFormSelect>
+                                </CCol>
+
+                                <CCol lg={6} md={6} sm={12}>
+                                    <CFormSelect
+                                        className="mb-1"
+                                        aria-label="Select Service Name"
+                                        value={ServiceVariation}
+                                        onChange={(e) => setServiceVariation(e.target.value)}
+                                        label="Service Variation"
+
+                                    >
+                                        <option>Select Variation</option>
+                                        {result.filter((list) =>
+                                            list.selected_service === ServiceName
+                                        ).map((item, index) => (
+                                            item.username === username && (
+                                                item.status === true && (
+                                                    <option key={index}>{item.sub_Service_Name}</option>
                                                 )
                                             )
                                         ))}
@@ -423,21 +481,21 @@ const EnquiryForm = (props) => {
                                     />
                                 </CCol>
                                 <CCol lg={6} md={6} sm={12}>
+
+
                                     <CFormSelect
                                         className="mb-1"
-                                        aria-label="Select Enquiry Type"
+                                        aria-label="Select Assign Staff"
                                         value={enquirytype}
                                         onChange={(e) => setEnquirytype(e.target.value)}
-                                        label="Enquiry Type"
-                                        options={[
-                                            "Select Enquiry Type",
-                                            { label: "Walk-In", value: "Walk-In" },
-                                            { label: "E-mail", value: "E-mail" },
-                                            { label: "Social Media", value: "Social Media" },
-                                            { label: "Website", value: "Website" },
-                                            { label: "Call Enquiry", value: "Call Enquiry" },
-                                        ]}
-                                    />
+                                        label="Enquiry Source"
+                                    >
+                                        <option>Select Enquiry source</option>
+                                        {leadArr.filter((list) => list.username === username).map((item, index) => (
+                                            item.username === username && (
+                                                <option key={index}>{item.LeadSource}</option>
+                                            )
+                                        ))}</CFormSelect>
                                 </CCol>
                                 <CCol lg={6} md={6} sm={12}>
                                     <CFormInput
@@ -463,7 +521,7 @@ const EnquiryForm = (props) => {
                                 <CCol lg={6} md={6} sm={12}>
                                     <CFormSelect
                                         className="mb-1"
-                                        label='Enquiry For'
+                                        label='Enquiry Stage'
                                         aria-label="Select"
                                         value={appointmentfor}
                                         onChange={(e) => setappointmentfor(e.target.value)}
@@ -471,24 +529,31 @@ const EnquiryForm = (props) => {
                                             "Select",
                                             { label: "Appointment", value: "Appointment" },
                                             { label: "Trial Session", value: "Trial Session" },
+                                            { label: "Join", value: "Join" },
+                                            { label: "Enquiry", value: "Enquiry" },
                                         ]}
                                     />
                                 </CCol>
                                 <CCol lg={6} md={6} sm={12}>
-                                    <CFormInput
-                                        type="text"
+
+                                    <CFormSelect
                                         className="mb-1"
-                                        label='Counseller'
-                                        aria-label="Select"
+                                        aria-label="Select Assign Staff"
                                         value={counseller}
                                         onChange={(e) => setCounseller(e.target.value)}
-
-                                    />
+                                        label='Counseller'
+                                    >
+                                        <option>Select Counseller</option>
+                                        {staff.filter((list) => list.username === username && list.Department.toLowerCase() === 'sales' && list.selected === 'Select').map((item, index) => (
+                                            item.username === username && (
+                                                <option key={index}>{item.FullName}</option>
+                                            )
+                                        ))}</CFormSelect>
                                 </CCol>
                             </CRow>
                         </CCol>
                     </CRow>
-                    <CButton className="mt-2" type="submit">Save</CButton>
+                    <CButton className="mt-2" onClick={() => saveEnquiry()}>Save</CButton>
                 </CForm>
             </CCardBody>
         </CCard>

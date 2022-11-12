@@ -150,8 +150,10 @@ const AppHeaderDropdownForm = () => {
           Expense
         </CDropdownItem>
         <CDropdownItem href="#">
-          <CIcon icon={cilCreditCard} className="me-2" />
-          Invoice
+          <Link style={{ textDecoration: 'none' }} to="/forms/invoice">
+            <CIcon icon={cilCreditCard} className="me-2" />
+            Invoice
+          </Link>
         </CDropdownItem>
         <CDropdownItem href="#">
           <CIcon icon={cilFile} className="me-2" />

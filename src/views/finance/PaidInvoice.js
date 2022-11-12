@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     CButton,
     CButtonGroup,
@@ -20,8 +20,61 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilArrowCircleBottom, cilArrowCircleTop, cilPlus } from '@coreui/icons'
+import { MdDelete } from 'react-icons/md'
+import axios from 'axios'
+import moment from 'moment'
+const url = 'https://yog-api.herokuapp.com'
 
 const PaidInvoice = () => {
+
+    let user = JSON.parse(localStorage.getItem('user-info'))
+    const token = user.token;
+    const username = user.user.username;
+    const centerCode = user.user.centerCode;
+    const [result1, setResult1] = useState([]);
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'My-Custom-Header': 'foobar'
+    };
+    useEffect(() => {
+        getInvoice()
+    }, []);
+
+    function getInvoice() {
+        axios.get(`${url}/invoice/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                console.log(res.data)
+                setResult1(res.data)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
+
+    function deleteData(id) {
+        if (confirm('You want to delete this')) {
+            fetch(`${url}/invoice/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then((resp) => {
+                    console.warn(resp)
+                    getInvoice()
+                })
+            })
+        }
+        return
+    }
+
+
     return (
         <CRow>
             <CCol lg={12} sm={12}>
@@ -118,58 +171,48 @@ const PaidInvoice = () => {
                                 </CButton>
                             </CCol>
                         </CRow>
-                        <CTable bordered style={{ borderColor: "#106103" }} responsive>
-                            <CTableHead style={{ backgroundColor: "#106103", color: "white" }}>
+
+                        <CTable className='mt-3' align="middle" bordered style={{ borderColor: "#0B5345" }} hover responsive>
+                            <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
                                 <CTableRow>
                                     <CTableHeaderCell scope="col">Sr No</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">MemberID</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">Member Name</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">
+                                        Invoice No
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">Services</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">Start Date</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">
+                                        End Date
+                                    </CTableHeaderCell>
                                     <CTableHeaderCell scope="col">Counseller</CTableHeaderCell>
-                                    <CTableHeaderCell scope="col">Target</CTableHeaderCell>
-                                    <CTableHeaderCell scope="col">
-                                        Achieved/Collected
-                                    </CTableHeaderCell>
-                                    <CTableHeaderCell scope="col">New Sales</CTableHeaderCell>
-                                    <CTableHeaderCell scope="col">Renewals</CTableHeaderCell>
-                                    <CTableHeaderCell scope="col">
-                                        Balance Collection
-                                    </CTableHeaderCell>
-                                    <CTableHeaderCell scope="col">View</CTableHeaderCell>
-                                    <CTableHeaderCell scope="col">Achived %</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">Amonut</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">Tax</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">Paid</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">Pending</CTableHeaderCell>
+                                    <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                                 </CTableRow>
                             </CTableHead>
                             <CTableBody>
-                                <CTableRow>
-                                    <CTableHeaderCell scope="row">1</CTableHeaderCell>
-                                    <CTableDataCell>Sejal</CTableDataCell>
-                                    <CTableDataCell>10000</CTableDataCell>
-                                    <CTableDataCell>10000</CTableDataCell>
-                                    <CTableDataCell>5000</CTableDataCell>
-                                    <CTableDataCell>2000</CTableDataCell>
-                                    <CTableDataCell>3000</CTableDataCell>
-                                    <CTableDataCell>View</CTableDataCell>
-                                    <CTableDataCell>100%</CTableDataCell>
-                                </CTableRow>
-                                <CTableRow>
-                                    <CTableHeaderCell scope="row">2</CTableHeaderCell>
-                                    <CTableDataCell>Sejal</CTableDataCell>
-                                    <CTableDataCell>10000</CTableDataCell>
-                                    <CTableDataCell>10000</CTableDataCell>
-                                    <CTableDataCell>5000</CTableDataCell>
-                                    <CTableDataCell>2000</CTableDataCell>
-                                    <CTableDataCell>3000</CTableDataCell>
-                                    <CTableDataCell>View</CTableDataCell>
-                                    <CTableDataCell>100%</CTableDataCell>
-                                </CTableRow>
-                                <CTableRow>
-                                    <CTableHeaderCell scope="row">3</CTableHeaderCell>
-                                    <CTableDataCell>Sejal</CTableDataCell>
-                                    <CTableDataCell>10000</CTableDataCell>
-                                    <CTableDataCell>10000</CTableDataCell>
-                                    <CTableDataCell>5000</CTableDataCell>
-                                    <CTableDataCell>2000</CTableDataCell>
-                                    <CTableDataCell>3000</CTableDataCell>
-                                    <CTableDataCell>View</CTableDataCell>
-                                    <CTableDataCell>100%</CTableDataCell>
-                                </CTableRow>
+                                {result1.filter((list) => list.username === username && list.paidAmount > 0)
+                                    .map((item, index) => (
+                                        <CTableRow key={index}>
+                                            <CTableHeaderCell>{index + 1}</CTableHeaderCell>
+                                            <CTableDataCell>{centerCode}MEM{index + 1}</CTableDataCell>
+                                            <CTableDataCell>{item.MemberName}</CTableDataCell>
+                                            <CTableDataCell>{item.InvoiceNo}</CTableDataCell>
+                                            <CTableDataCell>{item.ServiceName}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.startDate).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.endDate).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{item.counseller}</CTableDataCell>
+                                            <CTableDataCell>{item.totalAmount}</CTableDataCell>
+                                            <CTableDataCell>{item.tax}%</CTableDataCell>
+                                            <CTableDataCell>{item.paidAmount}</CTableDataCell>
+                                            <CTableDataCell>{item.pendingAmount}</CTableDataCell>
+                                            <CTableDataCell><MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deleteData(item._id)} size='20px' /></CTableDataCell>
+                                        </CTableRow>
+                                    ))}
                             </CTableBody>
                         </CTable>
                     </CCardBody>

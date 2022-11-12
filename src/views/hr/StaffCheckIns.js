@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     CButton,
     CButtonGroup,
@@ -12,68 +12,132 @@ import {
     CInputGroup,
     CInputGroupText,
     CRow,
+    CTable,
+    CTableBody,
+    CTableDataCell,
+    CTableHead,
+    CTableHeaderCell,
+    CTableRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilArrowCircleBottom, cilArrowCircleTop, cilFile, cilInfo } from '@coreui/icons'
 import { FaBeer } from 'react-icons/fa';
 import DataTable from 'src/components/DataTable'
+import { MdDelete, MdEdit } from 'react-icons/md';
+import moment from 'moment';
+import axios from 'axios';
+const url = 'https://yog-api.herokuapp.com'
 
 
 const StaffCheckIns = () => {
 
 
-    const header = [
+    const time = null;
+    const [ctime, setDate] = useState(time);
+    let user = JSON.parse(localStorage.getItem('user-info'))
+    const token = user.token;
+    const username = user.user.username;
+    const centerCode = user.user.centerCode;
+    const [result1, setResult1] = useState([]);
+    const [allClient, setAllclient] = useState([]);
+    useEffect(() => {
+        getEnquiry()
+        getClient()
+    }, []);
 
-        /* 
-        value: keyword for normal value passing
-        btn: keyword for button
-        btn1 to btn4: keyword for component passing
-        lebel: keyword for anchor tag
-        Note: please don't pass empty values or perameters
-        */
+    function getEnquiry() {
+        axios.get(`${url}/staffAttendance/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setResult1(res.data)
+                console.log(res.data);
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
-        { heading: 'Sr.No', value: 'id' },
-        { heading: 'Name', value: 'id' },
-        { heading: 'Mobile', value: 'date_time' },
-        { heading: 'Email Id', value: 'member_name' },
-        { heading: 'Gender', value: 'mobile' },
-        { heading: 'Address', value: 'service_name' },
-        { heading: 'Sources', value: 'variation_name' },
-        { heading: 'Exp Salary', value: 'expiry_date' },
-        { heading: 'Department', value: 'expiry_date' },
-        { heading: 'Desgantion', btn: 'renew' },
-        { heading: 'Resume', iconBtn: cilFile },
-        { heading: 'Action', com: (<> <FaBeer size='20px' /></>) },
-    ]
+    function getClient() {
+        axios.get(`${url}/employeeForm/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setAllclient(res.data)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
-    const Users = [
-        {
-            id: 1,
-            date_time: "25-08-2022 03:00 PM",
-            member_name: "Nayana Nagrecha",
-            mobile: "9136123476",
-            service_name: "Yoga",
-            variation_name: "3 Months",
-            expiry_date: "31-08-2022",
-            sales_rep: "Sejal Ganatra",
-            pt_trainer: "-",
-            trainer: "Prabha Yadav",
-            staff_name: "Sejal Ganatra",
-        },
-        {
-            id: 2,
-            date_time: "25-08-2022 03:00 PM",
-            member_name: "Nayana Nagrecha",
-            mobile: "9136123476",
-            service_name: "Yoga",
-            variation_name: "3 Months",
-            expiry_date: "31-08-2022",
-            sales_rep: "Sejal Ganatra",
-            pt_trainer: "-",
-            trainer: "Prabha Yadav",
-            staff_name: "Sejal Ganatra",
-        },
-    ];
+
+
+    const handelTime = () => {
+        let time = new Date().toLocaleTimeString();
+        var currentdate = new Date();
+        var date = currentdate.getFullYear() + "/" + currentdate.getMonth()
+            + "/" + currentdate.getDay();
+
+        setDate(time);
+        let data = {
+            username: username, StaffName: client, centerId: centerCode, attentanceId: attendanceID, checkDate: date, checkIn: time
+        }
+
+        fetch(`${url}/staffAttendance/create`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        }).then((resp) => {
+            resp.json().then(() => {
+                alert("successfully submitted")
+                setAttendance(2)
+            })
+        })
+    }
+
+    const CheckOut = (id) => {
+        let time2 = new Date().toLocaleTimeString();
+        let item = { checkOut: time2 }
+        fetch(`${url}/staffAttendance/update/${id}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item)
+        }).then((result) => {
+            result.json().then((resp) => {
+                getEnquiry()
+            })
+        })
+    }
+
+    const submitBtn = () => {
+        allClient.filter((list) => list.AttendanceID.includes(attendanceID)).length;
+        if (allClient.filter((list) => list.AttendanceID.includes(attendanceID)).length) {
+            allClient.filter((list) =>
+                list.AttendanceID.includes(attendanceID)
+            ).map((data) => (
+                setClient(data.Fullname),
+                setAttendanceID(data.AttendanceID),
+                setCentarId(data.CenterID),
+                setAttendance(1),
+                setStatus(data.status),
+                setError('')
+            ))
+        } else {
+            setError('Not Found')
+        }
+    }
 
 
     return (
@@ -121,7 +185,35 @@ const StaffCheckIns = () => {
                                 </CButtonGroup>
                             </CCol>
                         </CRow>
-                        <DataTable heading={header} data={Users} />
+
+                        <CTable className='mt-3' align="middle" bordered style={{ borderColor: "#0B5345" }} hover responsive>
+                            <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
+                                <CTableRow >
+                                    <CTableHeaderCell>Sr.No</CTableHeaderCell>
+                                    <CTableHeaderCell>Staff Name</CTableHeaderCell>
+                                    <CTableHeaderCell>Attendance ID</CTableHeaderCell>
+                                    <CTableHeaderCell>Center ID</CTableHeaderCell>
+                                    <CTableHeaderCell>Check Date</CTableHeaderCell>
+                                    <CTableHeaderCell>CheckIn Time</CTableHeaderCell>
+                                    <CTableHeaderCell>CheckOut Time</CTableHeaderCell>
+                                    <CTableHeaderCell>Action</CTableHeaderCell>
+                                </CTableRow>
+                            </CTableHead>
+                            <CTableBody>
+                                {result1.filter((list) => list.username === username).map((item, index) => (
+                                    <CTableRow key={index}>
+                                        <CTableDataCell>{index + 1}</CTableDataCell>
+                                        <CTableDataCell>{item.StaffName}</CTableDataCell>
+                                        <CTableDataCell>{item.attentanceId}</CTableDataCell>
+                                        <CTableDataCell>{item.centerId}</CTableDataCell>
+                                        <CTableDataCell>{moment(item.createdAt).format("LL")}</CTableDataCell>
+                                        <CTableDataCell>{item.checkIn}</CTableDataCell>
+                                        <CTableDataCell>{item.checkOut}</CTableDataCell>
+                                        <CTableDataCell><MdEdit style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deleteEnquiry(item._id)} size='20px' /> <MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deleteEnquiry(item._id)} size='20px' /> </CTableDataCell>
+                                    </CTableRow>
+                                ))}
+                            </CTableBody>
+                        </CTable>
                     </CCardBody>
                 </CCard>
             </CCol>

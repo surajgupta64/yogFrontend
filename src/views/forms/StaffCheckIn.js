@@ -20,6 +20,7 @@ const StaffCheckin = () => {
     let user = JSON.parse(localStorage.getItem('user-info'))
     const token = user.token;
     const username = user.user.username;
+    const centerCode = user.user.centerCode;
     const [result1, setResult1] = useState([]);
     const [allClient, setAllclient] = useState([]);
     useEffect(() => {
@@ -66,7 +67,7 @@ const StaffCheckin = () => {
 
         setDate(time);
         let data = {
-            username: username, StaffName: client, centerId: centarId, attentanceId: attendanceID, checkDate: date, checkIn: time
+            username: username, StaffName: client, centerId: centerCode, attentanceId: attendanceID, checkDate: date, checkIn: time
         }
 
         fetch(`${url}/staffAttendance/create`, {

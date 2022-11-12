@@ -22,6 +22,9 @@ const ColdEnquires = React.lazy(() => import('./views/leads/ColdEnquires'))
 //Clients
 const AllClients = React.lazy(() => import('./views/clients/AllClients'))
 const ActiveClients = React.lazy(() => import('./views/clients/ActiveClients'))
+const RenewalsClients = React.lazy(() => import('./views/clients/Renewals'))
+const RenewedClients = React.lazy(() => import('./views/clients/Renewed'))
+const LeftClients = React.lazy(() => import('./views/clients/LeftClients'))
 const ServiceCall = React.lazy(() => import('./views/clients/serviceCall/ServiceCall'))
 const AllService = React.lazy(() => import('./views/clients/allService/AllService'))
 const MemberDetails = React.lazy(() => import('./views/clients/MemberDetails/MemberDetails'))
@@ -42,6 +45,8 @@ const StockReport = React.lazy(() => import('./views/Inventory/StockReport'))
 
 //finance
 const TotalInvoices = React.lazy(() => import('./views/finance/TotalInvoice'))
+const PaidInvoices = React.lazy(() => import('./views/finance/PaidInvoice'))
+const CancelInvoices = React.lazy(() => import('./views/finance/CancelInvoice'))
 const RevenueDetails = React.lazy(() => import('./views/finance/RevenueDetails'))
 
 // Hr
@@ -64,6 +69,16 @@ const PackageMaster = React.lazy(() => import('./views/Master/centerSetup/Packag
 const BatchMaster = React.lazy(() => import('./views/Master/centerSetup/BatchMaster'))
 const FormMaster = React.lazy(() => import('./views/Master/centerSetup/FormMaster'))
 const Designation = React.lazy(() => import('./views/Master/HRMaster/Designation'))
+const HolidayListMaster = React.lazy(() => import('./views/Master/HRMaster/HolidaysListMaster'))
+const HRPolicyMaster = React.lazy(() => import('./views/Master/HRMaster/HRPolicy'))
+const EmailSMSMaster = React.lazy(() => import('./views/Master/marketing/EmailSmsMaster'))
+const GalleryMaster = React.lazy(() => import('./views/Master/marketing/GalleryMaster'))
+const LeadSourceMaster = React.lazy(() => import('./views/Master/marketing/LeadSourceMaster'))
+const BudgetingMaster = React.lazy(() => import('./views/Master/finance/BudgetingMaster'))
+const ExpressCategoryMaster = React.lazy(() => import('./views/Master/finance/ExpressCategoryMaster'))
+const InvoiceMaster = React.lazy(() => import('./views/Master/finance/InvoiceMaster'))
+const TaxSetupMaster = React.lazy(() => import('./views/Master/finance/TaxSetupMaster'))
+const ClientTransferMaster = React.lazy(() => import('./views/Master/client/ClientTransferMaster'))
 
 // Base
 const Accordion = React.lazy(() => import('./views/base/accordion/Accordion'))
@@ -100,6 +115,7 @@ const Dropdowns = React.lazy(() =>
 const EnquiryForm = React.lazy(() => import('./views/forms/EnquiryForm'))
 const MemberForm = React.lazy(() => import('./views/forms/MemberForm'))
 const StaffForm = React.lazy(() => import('./views/forms/Recruitment'))
+const InvoiceForm = React.lazy(() => import('./components/MakeInvoice'))
 const LiveClass = React.lazy(() => import('./views/forms/LiveClass'))
 const OfflineClass = React.lazy(() => import('./views/forms/OfflineClass'))
 const TTC = React.lazy(() => import('./views/forms/TTC'))
@@ -188,6 +204,9 @@ const routes = [
   { path: '/clients/client-management', name: 'Client Management', element: AllClients, exact: true },
   { path: '/clients/client-management/active-clients', name: 'Active Clients', element: ActiveClients },
   { path: '/clients/client-management/all-clients', name: 'All Clients', element: AllClients },
+  { path: '/clients/client-management/renewals-clients', name: 'Renewals Clients', element: RenewalsClients },
+  { path: '/clients/client-management/renewed-clients', name: 'Renewed Clients', element: RenewedClients },
+  { path: '/clients/client-management/left-clients', name: 'Left Clients', element: LeftClients },
   { path: '/clients/service-call', name: 'Service Calls', element: ServiceCall },
   { path: '/clients/all-service', name: 'All Service', element: AllService },
   { path: '/clients/member-details', name: 'Member Details', element: MemberDetails },
@@ -212,6 +231,8 @@ const routes = [
   //Finance
   { path: '/finance', name: 'Finance', element: TotalInvoices, exact: true },
   { path: '/finance/total-invoice', name: 'Total Invoice', element: TotalInvoices },
+  { path: '/finance/paid-invoice', name: 'Paid Invoice', element: PaidInvoices },
+  { path: '/finance/cancel-invoice', name: 'cancel Invoice', element: CancelInvoices },
   { path: '/finance/revenue-details', name: 'Revenue details', element: RevenueDetails },
 
   //HR
@@ -237,8 +258,24 @@ const routes = [
   { path: '/master/center-setup/form-master', name: 'Form Master', element: FormMaster, exact: true },
 
 
+  { path: '/master/clients', name: 'Marketing Master', element: Designation, exact: true },
+  { path: '/master/clients/client-transfer', name: 'Client Tranfer', element: ClientTransferMaster, exact: true },
+
+  { path: '/master/marketing', name: 'Marketing Master', element: Designation, exact: true },
+  { path: '/master/marketing/emailsmsTemplate', name: 'Template', element: EmailSMSMaster, exact: true },
+  { path: '/master/marketing/galleryMaster', name: 'Gallery Master', element: GalleryMaster, exact: true },
+  { path: '/master/marketing/leadSourceMaster', name: 'Lead Source Master', element: LeadSourceMaster, exact: true },
+
   { path: '/master/hr', name: 'HR Master', element: Designation, exact: true },
   { path: '/master/hr/designation', name: 'Employee Designation', element: Designation, exact: true },
+  { path: '/master/hr/holiday', name: 'Holidays List', element: HolidayListMaster, exact: true },
+  { path: '/master/hr/hrPolicy', name: 'HR Policy', element: HRPolicyMaster, exact: true },
+
+  { path: '/master/finance', name: 'Finance Master', element: Designation, exact: true },
+  { path: '/master/finance/expness', name: 'Express Category', element: ExpressCategoryMaster, exact: true },
+  { path: '/master/finance/budgeting', name: 'Budgeting', element: BudgetingMaster, exact: true },
+  { path: '/master/finance/invoice', name: 'Invoice', element: InvoiceMaster, exact: true },
+  { path: '/master/finance/tax', name: 'Tax', element: TaxSetupMaster, exact: true },
 
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
@@ -273,6 +310,7 @@ const routes = [
   { path: '/forms/enquiry-form', name: 'Enquiry Form', element: EnquiryForm },
   { path: '/forms/staff-form', name: 'Employee Form', element: StaffForm },
   { path: '/forms/member-form', name: 'Member Form', element: MemberForm },
+  { path: '/forms/invoice', name: 'Invoice', element: InvoiceForm },
   { path: '/forms/live-class', name: 'Live Class', element: LiveClass },
   { path: '/forms/offline-class', name: 'Offline Class', element: OfflineClass },
   { path: '/forms/pt-class', name: 'PT Class', element: PTClass },

@@ -32,11 +32,13 @@ import axios from 'axios'
 import { MdCall, MdDelete, MdEdit, MdMail } from 'react-icons/md'
 import { BsPlusCircle, BsWhatsapp } from 'react-icons/bs'
 import moment from 'moment/moment'
+import AdmissionForm1 from 'src/components/AdmissionForm1'
 const url = 'https://yog-api.herokuapp.com'
 
 const TrialEnquires = () => {
     const [select, setSelect] = useState()
     const [followForm, setFollowForm] = useState()
+    const [admissionForm, setAdmissionForm] = useState(false)
     const [edit, setEdit] = useState()
     const [callReport, setCallReport] = useState(false)
     const [visible, setVisible] = useState(false)
@@ -369,7 +371,7 @@ const TrialEnquires = () => {
             <CCol lg={12} sm={12}>
                 <CCard className='mb-3 border-top-success border-top-3'>
                     <CCardHeader>
-                        <strong className="mt-2">Enquire Appointment <span className='float-end'>Total Appointment : {result1.filter((list) => list.username === username && list.appointmentfor.includes('Trial Session')).length}</span></strong>
+                        <strong className="mt-2">Enquire Trial <span className='float-end'>Total Trial : {result1.filter((list) => list.username === username && list.appointmentfor.includes('Trial Session')).length}</span></strong>
                     </CCardHeader>
                     <CCardBody>
                         <CRow className='d-flex justify-content-between'>
@@ -435,7 +437,7 @@ const TrialEnquires = () => {
                             </CCol>
                         </CRow>
 
-                        <CRow className='mb-3'>
+                        {/* <CRow className='mb-3'>
                             <CCol lg={2} md={6} sm={6} className='mb-2'>
                                 <CInputGroup>
                                     <CInputGroupText
@@ -496,7 +498,7 @@ const TrialEnquires = () => {
                                 </CInputGroup>
                             </CCol>
                         </CRow>
-
+ */}
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={callReport} color='' onClose={() => setCallReport(false)} >
                             <CModalHeader  >
                                 <CModalTitle>Call Report</CModalTitle>
@@ -626,6 +628,8 @@ const TrialEnquires = () => {
                                 <CButton type='submit' color="primary" onClick={() => saveCallReport()}>Save Call Report</CButton>
                             </CModalFooter>
                         </CModal>
+                        <AdmissionForm1 add={admissionForm} clickfun={() => setAdmissionForm(false)} ids={edit} />
+
 
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={visible} color='' onClose={() => setVisible(false)} >
                             <CModalHeader  >
@@ -1106,7 +1110,7 @@ const TrialEnquires = () => {
                                     <CTableHeaderCell>Enquiry stage</CTableHeaderCell>
                                     <CTableHeaderCell>Call Status</CTableHeaderCell>
                                     <CTableHeaderCell>Last Call</CTableHeaderCell>
-                                    <CTableHeaderCell>Addmission</CTableHeaderCell>
+                                    <CTableHeaderCell>Add</CTableHeaderCell>
                                     <CTableHeaderCell>Assigned by</CTableHeaderCell>
                                     <CTableHeaderCell>Counseller</CTableHeaderCell>
                                     <CTableHeaderCell>Action</CTableHeaderCell>
@@ -1273,9 +1277,8 @@ const TrialEnquires = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username && list.appointmentfor === 'Trial Session' && list.appointmentDate.includes(Search1) && list.appointmentTime.includes(Search2) && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) &&
-                                    list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.appointmentfor.toLowerCase().includes(Search7.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
-                                    && list.StaffName.toLowerCase().includes(Search9.toLowerCase())
+                                    list.username === username && list.appointmentfor === 'Trial Session' && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
+                                    list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
                                 ).map((item, index) => (
                                     item.username === username && (
                                         <CTableRow key={index}>
@@ -1290,13 +1293,12 @@ const TrialEnquires = () => {
                                             <CTableDataCell>{item.appointmentfor}</CTableDataCell>
                                             <CTableDataCell>{item.CallStatus}</CTableDataCell>
                                             <CTableDataCell>{item.Message}</CTableDataCell>
-                                            <CTableDataCell>-</CTableDataCell>
+                                            <CTableDataCell><BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => { setAdmissionForm(true), setEdit(item._id) }} /></CTableDataCell>
                                             <CTableDataCell>{item.StaffName}</CTableDataCell>
                                             <CTableDataCell>{item.Counseller}</CTableDataCell>
                                             <CTableDataCell className='text-center'><a href={`tel:+${item.CountryCode}${item.ContactNumber}`} target="_black"><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`} target="_black"><BsWhatsapp style={{ marginLeft: "4px", cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`} target="_black"> <MdMail style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
                                             <CTableDataCell className='text-center'><MdEdit id={item._id} style={{ fontSize: '35px', cursor: 'pointer', markerStart: '10px' }} onClick={() => handleEnquiry(item._id)} size='20px' /> <MdDelete style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "5px" }} onClick={() => deleteEnquiry(item._id)} size='20px' /></CTableDataCell>
                                         </CTableRow>
-
                                     )
                                 ))}
                             </CTableBody>

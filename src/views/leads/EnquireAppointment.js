@@ -32,15 +32,17 @@ import axios from 'axios'
 import { MdCall, MdDelete, MdEdit, MdMail } from 'react-icons/md'
 import { BsPlusCircle, BsWhatsapp } from 'react-icons/bs'
 import moment from 'moment/moment'
+import AdmissionForm1 from 'src/components/AdmissionForm1'
 const url = 'https://yog-api.herokuapp.com'
 
-const EnquireAppoitment = () => {
+const EnquireAppointment = () => {
     const [select, setSelect] = useState()
     const [followForm, setFollowForm] = useState()
     const [edit, setEdit] = useState()
+    const [visible1, setVisible1] = useState(false)
+    const [admissionForm, setAdmissionForm] = useState(false)
     const [callReport, setCallReport] = useState(false)
     const [visible, setVisible] = useState(false)
-    const [visible1, setVisible1] = useState(false)
     const [Search1, setSearch1] = useState('')
     const [Search2, setSearch2] = useState('')
     const [Search3, setSearch3] = useState('')
@@ -369,7 +371,7 @@ const EnquireAppoitment = () => {
             <CCol lg={12} sm={12}>
                 <CCard className='mb-3 border-top-success border-top-3'>
                     <CCardHeader>
-                        <strong className="mt-2">Enquire Appointment <span className='float-end'>Total Appointment : {result1.filter((list) => list.username === username && list.appointmentfor.includes('Appointment')).length}</span></strong>
+                        <strong className="mt-2">Enquire Appointment <span className='float-end'>Total Member : {result1.filter((list) => list.username === username && list.appointmentfor === 'Appointment').length}</span></strong>
                     </CCardHeader>
                     <CCardBody>
                         <CRow className='d-flex justify-content-between'>
@@ -434,7 +436,7 @@ const EnquireAppoitment = () => {
                                 </CButtonGroup>
                             </CCol>
                         </CRow>
-
+                        {/* 
                         <CRow className='mb-3'>
                             <CCol lg={2} md={6} sm={6} className='mb-2'>
                                 <CInputGroup>
@@ -495,7 +497,8 @@ const EnquireAppoitment = () => {
                                     </CFormSelect>
                                 </CInputGroup>
                             </CCol>
-                        </CRow>
+                        </CRow> */}
+                        <AdmissionForm1 add={admissionForm} clickfun={() => setAdmissionForm(false)} ids={edit} />
 
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={callReport} color='' onClose={() => setCallReport(false)} >
                             <CModalHeader  >
@@ -1106,7 +1109,8 @@ const EnquireAppoitment = () => {
                                     <CTableHeaderCell>Enquiry stage</CTableHeaderCell>
                                     <CTableHeaderCell>Call Status</CTableHeaderCell>
                                     <CTableHeaderCell>Last Call</CTableHeaderCell>
-                                    <CTableHeaderCell>Addmission</CTableHeaderCell>
+                                    <CTableHeaderCell>Add</CTableHeaderCell>
+                                    <CTableHeaderCell>Appointment Date & Time</CTableHeaderCell>
                                     <CTableHeaderCell>Assigned by</CTableHeaderCell>
                                     <CTableHeaderCell>Counseller</CTableHeaderCell>
                                     <CTableHeaderCell>Action</CTableHeaderCell>
@@ -1236,6 +1240,15 @@ const EnquireAppoitment = () => {
                                     <CTableDataCell>
                                         <CFormInput
                                             className="mb-1"
+                                            style={{ minWidth: "100px" }}
+                                            type="text"
+                                            disabled
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
                                             type="text"
                                             style={{ minWidth: "100px" }}
                                             value={Search9}
@@ -1249,6 +1262,7 @@ const EnquireAppoitment = () => {
                                             type="text"
                                             value={Search10}
                                             style={{ minWidth: "100px" }}
+                                            disabled
                                             onChange={(e) => setSearch10(e.target.value)}
                                             aria-describedby="exampleFormControlInputHelpInline"
                                         />
@@ -1273,16 +1287,15 @@ const EnquireAppoitment = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username && list.appointmentfor === 'Appointment' && list.appointmentDate.includes(Search1) && list.appointmentTime.includes(Search2) && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) &&
-                                    list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.appointmentfor.toLowerCase().includes(Search7.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
-                                    && list.StaffName.toLowerCase().includes(Search9.toLowerCase())
+                                    list.username === username && list.appointmentfor === 'Appointment' && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
+                                    list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
                                 ).map((item, index) => (
                                     item.username === username && (
                                         <CTableRow key={index}>
                                             <CTableDataCell>{index + 1}</CTableDataCell>
                                             <CTableDataCell>{centerCode}ENQ{index + 10}</CTableDataCell>
-                                            <CTableDataCell className='text-center'>{moment(item.appointmentDate).format("LL")}</CTableDataCell>
-                                            <CTableDataCell>{moment(item.appointmentTime, "HH:mm").format("hh:mm A")}</CTableDataCell>
+                                            <CTableDataCell className='text-center'>{moment(item.createdAt).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.createdAt, "HH:mm").format("hh:mm A")}</CTableDataCell>
                                             <CTableDataCell>{item.Fullname}</CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>
                                             <CTableDataCell>{item.ServiceName}</CTableDataCell>
@@ -1290,13 +1303,13 @@ const EnquireAppoitment = () => {
                                             <CTableDataCell>{item.appointmentfor}</CTableDataCell>
                                             <CTableDataCell>{item.CallStatus}</CTableDataCell>
                                             <CTableDataCell>{item.Message}</CTableDataCell>
-                                            <CTableDataCell>-</CTableDataCell>
+                                            <CTableDataCell><BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => { setAdmissionForm(true), setEdit(item._id) }} /></CTableDataCell>
+                                            <CTableDataCell>{moment(item.appointmentDate).format("MM-DD-YYYY")}<br />{moment(item.appointmentTime, "HH:mm").format("hh:mm A")}</CTableDataCell>
                                             <CTableDataCell>{item.StaffName}</CTableDataCell>
                                             <CTableDataCell>{item.Counseller}</CTableDataCell>
                                             <CTableDataCell className='text-center'><a href={`tel:+${item.CountryCode}${item.ContactNumber}`} target="_black"><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`} target="_black"><BsWhatsapp style={{ marginLeft: "4px", cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`} target="_black"> <MdMail style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "4px" }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
                                             <CTableDataCell className='text-center'><MdEdit id={item._id} style={{ fontSize: '35px', cursor: 'pointer', markerStart: '10px' }} onClick={() => handleEnquiry(item._id)} size='20px' /> <MdDelete style={{ cursor: 'pointer', markerStart: '10px', marginLeft: "5px" }} onClick={() => deleteEnquiry(item._id)} size='20px' /></CTableDataCell>
                                         </CTableRow>
-
                                     )
                                 ))}
                             </CTableBody>
@@ -1308,4 +1321,4 @@ const EnquireAppoitment = () => {
     )
 }
 
-export default EnquireAppoitment
+export default EnquireAppointment

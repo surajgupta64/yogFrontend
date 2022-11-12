@@ -10,7 +10,7 @@ const SMSMarketing = () => {
             <CCardBody>
                 <CForm>
                     <CRow>
-                        <CCol lg={6} md={6} sm={12}>
+                        <CCol lg={12} md={12} sm={12}>
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Gateway"
@@ -19,17 +19,6 @@ const SMSMarketing = () => {
                                     "Select Gateway",
                                     { label: "Transactional SMS Bal: 0", value: "Transactional SMS Bal: 0" },
                                     { label: "Promotional SMS Bal: 0", value: "Transactional SMS Bal: 0" },
-                                ]}
-                            />
-                        </CCol>
-                        <CCol lg={6} md={6} sm={12}>
-                            <CFormSelect
-                                className="mb-1"
-                                aria-label="Select Currency"
-                                label="Email Template"
-                                options={[
-                                    "Select Email Template",
-                                    { label: "yogpower@gmail.com", value: "yogpower@gmail.com" },
                                 ]}
                             />
                         </CCol>

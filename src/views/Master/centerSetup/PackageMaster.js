@@ -249,8 +249,7 @@ const PackageMaster = () => {
                                 <CTableRow key={index}>
                                     <CTableDataCell>{index + 1}</CTableDataCell>
                                     <CTableDataCell>{item.Package_Name}</CTableDataCell>
-                                    <CTableDataCell>{item.packages}</CTableDataCell>
-                                    <CTableDataCell>{item.duration}</CTableDataCell>
+                                    <CTableDataCell>{item.packages} {item.duration}</CTableDataCell>
                                     <CTableDataCell>{item.fees}</CTableDataCell>
                                     <CTableDataCell><CFormSwitch size="xl" style={{ cursor: 'pointer' }} id={item._id} value={item.status} checked={item.status} onChange={() => updateStatus(item._id, !item.status)} /></CTableDataCell>
                                     <CTableDataCell> <MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deletePackage(item._id)} size='20px' /> </CTableDataCell>

@@ -302,7 +302,7 @@ const Renewed = () => {
             <CCol lg={12} sm={12}>
                 <CCard className='mb-3 border-top-success border-top-3'>
                     <CCardHeader>
-                        <strong className="mt-2">All Clients <span className='float-end'>Total Clients : {result1.filter((list) => list.username === username).length}</span></strong>
+                        <strong className="mt-2">Renewed Clients <span className='float-end'>Total Clients : {result1.filter((list) => list.username === username && status === 'renewed').length}</span></strong>
                     </CCardHeader>
                     <CCardBody>
                         <CRow className='d-flex justify-content-between'>
@@ -368,7 +368,7 @@ const Renewed = () => {
                             </CCol>
                         </CRow>
 
-                        <CRow className='mb-3'>
+                        {/* <CRow className='mb-3'>
                             <CCol lg={2} md={6} sm={6} className='mb-2'>
                                 <CInputGroup>
                                     <CInputGroupText
@@ -433,7 +433,7 @@ const Renewed = () => {
                                     </CFormSelect>
                                 </CInputGroup>
                             </CCol>
-                        </CRow>
+                        </CRow> */}
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={visible} color='' onClose={() => setVisible(false)} >
                             <CModalHeader  >
                                 <CModalTitle>Prospect Form</CModalTitle>
@@ -1075,7 +1075,7 @@ const Renewed = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username
+                                    list.username === username && list.status === 'renewed'
 
                                     && list.Fullname.toLowerCase().includes(Search1.toLowerCase()) &&
                                     list.AttendanceID.toLowerCase().includes(Search5.toLowerCase()) && list.serviceName.toLowerCase().includes(Search6.toLowerCase()) && list.fitnessGoal.toLowerCase().includes(Search7.toLowerCase())
