@@ -111,56 +111,16 @@ const AllEmpProfile = () => {
                     </CCardHeader>
                     <CCardBody>
                         <CRow className='d-flex mb-2'>
-                            <CCol lg={6} sm={6} className='mb-2'>
-                                <CInputGroup style={{ height: "38px" }}>
-                                    <CFormSelect
-                                        id="inputGroupSelect04"
-                                        aria-label="Example select with button addon"
-                                    >
-                                        <option>Name</option>
-                                        <option value="1">Location</option>
-                                        <option value="2">Profile</option>
-                                        <option value="3">Mobile</option>
-                                        <option value="3">Email</option>
-                                    </CFormSelect>
-                                    <CFormInput
-                                        placeholder="Search"
-                                        aria-label="Recipient's username"
-                                        aria-describedby="button-addon2"
-                                    />
-                                    <CButton type="button" color="primary">
-                                        Search
-                                    </CButton>
-                                </CInputGroup>
+                            <CCol lg={6} sm={12} className='mb-2'>
+                                <CButtonGroup role="group" aria-label="Basic example">
+                                    <CButton color="dark" variant="outline" style={{ fontSize: '13px' }}>Total Employee: {staff.filter((list) => list.username === username).length}</CButton>
+                                    <CButton color="dark" variant="outline" style={{ fontSize: '13px' }}>Active Employee: {staff.filter((list) => list.username === username && list.status === true).length}</CButton>
+                                    <CButton color="dark" variant="outline" style={{ fontSize: '13px' }}>Left Employee: {staff.filter((list) => list.username === username && list.status === false).length}</CButton>
+                                </CButtonGroup>
                             </CCol>
-                            <CCol lg={6} sm={12}>
-                                <div className='d-flex justify-content-around'>
-                                    <CButtonGroup role="group" aria-label="Basic example">
-                                        <CButton color="dark" variant="outline" style={{ fontSize: '13px' }}>Total Employee: 0</CButton>
-                                        <CButton color="dark" variant="outline" style={{ fontSize: '13px' }}>Active Employee:0</CButton>
-                                        <CButton color="dark" variant="outline" style={{ fontSize: '13px' }}>Left Employee: 0</CButton>
-                                    </CButtonGroup>
-                                </div>
-                            </CCol>
-                        </CRow>
-                        <CRow className='mb-1'>
-                            <CCol lg={2} sm={6} className='mb-2'>
-                                <CInputGroup>
-                                    <CInputGroupText
-                                        component="label"
-                                        htmlFor="inputGroupSelect01"
-                                    >
-                                        All
-                                    </CInputGroupText>
-                                    <CFormSelect id="inputGroupSelect01">
-                                        <option>All Employee</option>
-                                        <option value="1">Active Employee</option>
-                                        <option value="2">Left Employee</option>
-                                    </CFormSelect>
-                                </CInputGroup>
-                            </CCol>
-                            <CCol lg={3} sm={6} className='mb-2' >
-                                <CButtonGroup>
+                            <CCol lg={3}></CCol>
+                            <CCol lg={3} sm={12}>
+                                <CButtonGroup className='float-end'>
                                     <CButton color="primary">
                                         <CIcon icon={cilArrowCircleBottom} />
                                         {' '}Import
@@ -231,6 +191,7 @@ const AllEmpProfile = () => {
                                             type="number"
                                             style={{ minWidth: "100px" }}
                                             value={Search10}
+
                                             onChange={(e) => setSearch10(e.target.value)}
                                             aria-describedby="exampleFormControlInputHelpInline"
                                         />
@@ -259,6 +220,7 @@ const AllEmpProfile = () => {
                                             className="mb-1"
                                             type="text"
                                             value={Search3}
+                                            disabled
                                             onChange={(e) => setSearch3(e.target.value)}
                                             aria-describedby="exampleFormControlInputHelpInline"
                                         />

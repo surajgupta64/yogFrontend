@@ -23,10 +23,25 @@ import { cilArrowCircleBottom, cilArrowCircleTop, cilPlus } from '@coreui/icons'
 import { MdDelete } from 'react-icons/md'
 import axios from 'axios'
 import moment from 'moment'
+import ViewInvoice from 'src/components/ViewInvoice'
 const url = 'https://yog-api.herokuapp.com'
 
 const PaidInvoice = () => {
 
+    const [select, setSelected] = useState('')
+    const [search, setSearch] = useState('')
+    const [viewInvoice, setViewInvoice] = useState(false);
+
+    const [Search1, setSearch1] = useState('')
+    const [Search2, setSearch2] = useState('')
+    const [Search3, setSearch3] = useState('')
+    const [Search4, setSearch4] = useState('')
+    const [Search5, setSearch5] = useState('')
+    const [Search6, setSearch6] = useState('')
+    const [Search7, setSearch7] = useState('')
+    const [Search8, setSearch8] = useState('')
+    const [Search9, setSearch9] = useState('')
+    const [Search10, setSearch10] = useState('')
     let user = JSON.parse(localStorage.getItem('user-info'))
     const token = user.token;
     const username = user.user.username;
@@ -54,6 +69,46 @@ const PaidInvoice = () => {
                 console.error(error)
             })
     }
+
+    const [invId, setinvId] = useState()
+    const [cliId, setCliId] = useState()
+    function handleInvoice(inId, clId) {
+        console.log(inId)
+        console.log(clId)
+        setinvId(null)
+        setCliId(null)
+        if (inId && clId != null) {
+            axios.get(`${url}/invoice/${inId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then((res) => {
+                    console.log(res.data)
+                    setinvId(res.data)
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+            axios.get(`${url}/memberForm/${clId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then((res) => {
+                    console.log(res.data)
+                    setCliId(res.data)
+
+                    if (invId != null && res.data != null) {
+                        setViewInvoice(true)
+                    }
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+        }
+    }
+
 
     function deleteData(id) {
         if (confirm('You want to delete this')) {
@@ -83,95 +138,10 @@ const PaidInvoice = () => {
                         <strong className="mt-2">Paid Invoice</strong>
                     </CCardHeader>
                     <CCardBody>
-                        <CRow className='d-flex justify-content-center mb-2'>
-                            <CCol lg={5} className='mb-2'>
-                                <CInputGroup>
-                                    <CFormSelect
-                                        id="inputGroupSelect04"
-                                        aria-label="Example select with button addon"
-                                    >
-                                        <option>Name</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </CFormSelect>
-                                    <CFormInput
-                                        placeholder="Search"
-                                        aria-label="Recipient's username"
-                                        aria-describedby="button-addon2"
-                                    />
-                                    <CButton type="button" color="primary">
-                                        Search
-                                    </CButton>
-                                </CInputGroup>
-                            </CCol>
-                            <CCol></CCol>
-                        </CRow>
-                        <CRow >
-                            <CCol lg={2} sm={6} className='mb-2'>
-                                <CInputGroup>
-                                    <CInputGroupText
-                                        component="label"
-                                        htmlFor="inputGroupSelect01"
-                                    >
-                                        All
-                                    </CInputGroupText>
-                                    <CFormSelect id="inputGroupSelect01">
-                                        <option>Sep</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </CFormSelect>
-                                </CInputGroup>
-                            </CCol>
-                            <CCol lg={2} sm={6} className='mb-2'>
-                                <CInputGroup>
-                                    <CFormSelect id="inputGroupSelect01">
-                                        <option>Invoice Type</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </CFormSelect>
-                                </CInputGroup>
-                            </CCol>
-                            <CCol lg={2} sm={6} className='mb-2'>
-                                <CInputGroup>
-                                    <CFormSelect id="inputGroupSelect01">
-                                        <option>Service</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </CFormSelect>
-                                </CInputGroup>
-                            </CCol>
-                            <CCol lg={2} sm={6} className='mb-2'>
-                                <CInputGroup>
-                                    <CFormSelect id="inputGroupSelect01">
-                                        <option>Sales Rep</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </CFormSelect>
-                                </CInputGroup>
-                            </CCol>
-                            <CCol lg={2} sm={6} className='mb-2'>
-                                <CInputGroup>
-                                    <CFormSelect id="inputGroupSelect01">
-                                        <option>Select Trainer</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </CFormSelect>
-                                </CInputGroup>
-                            </CCol>
-                            <CCol lg={2} sm={6} className='mb-2' >
-                                <CButton color="primary" className='float-end '>
-                                    <CIcon icon={cilPlus} />
-                                    {' '}New Invoice
-                                </CButton>
-                            </CCol>
-                        </CRow>
 
+                        {viewInvoice &&
+                            <ViewInvoice add={viewInvoice} clickfun={() => setViewInvoice(false)} invoiceId={invId} clientId={cliId} />
+                        }
                         <CTable className='mt-3' align="middle" bordered style={{ borderColor: "#0B5345" }} hover responsive>
                             <CTableHead style={{ backgroundColor: "#0B5345", color: "white" }} >
                                 <CTableRow>
@@ -191,17 +161,151 @@ const PaidInvoice = () => {
                                     <CTableHeaderCell scope="col">Tax</CTableHeaderCell>
                                     <CTableHeaderCell scope="col">Paid</CTableHeaderCell>
                                     <CTableHeaderCell scope="col">Pending</CTableHeaderCell>
-                                    <CTableHeaderCell scope="col">Action</CTableHeaderCell>
+                                    <CTableHeaderCell scope='col'>Status</CTableHeaderCell>
                                 </CTableRow>
                             </CTableHead>
                             <CTableBody>
-                                {result1.filter((list) => list.username === username && list.paidAmount > 0)
+                                <CTableRow>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            style={{ minWidth: "60px" }}
+                                            type="text"
+                                            disabled
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            style={{ minWidth: "120px" }}
+                                            type="text"
+                                            disabled
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "120px" }}
+                                            value={Search1}
+                                            onChange={(e) => setSearch1(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "90px" }}
+                                            value={Search2}
+                                            onChange={(e) => setSearch2(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "120px" }}
+                                            value={Search3}
+                                            onChange={(e) => setSearch3(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "120px" }}
+                                            value={Search4}
+                                            disabled
+                                            onChange={(e) => setSearch4(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            value={Search5}
+                                            disabled
+                                            style={{ minWidth: "120px" }}
+                                            onChange={(e) => setSearch5(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "120px" }}
+                                            value={Search6}
+                                            onChange={(e) => setSearch6(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "100px" }}
+                                            value={Search7}
+                                            onChange={(e) => setSearch7(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "100px" }}
+                                            value={Search8}
+                                            onChange={(e) => setSearch8(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            style={{ minWidth: "100px" }}
+                                            value={Search9}
+                                            onChange={(e) => setSearch9(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            type="text"
+                                            value={Search10}
+                                            style={{ minWidth: "100px" }}
+                                            onChange={(e) => setSearch10(e.target.value)}
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput
+                                            className="mb-1"
+                                            style={{ minWidth: "100px" }}
+                                            type="text"
+                                            disabled
+                                            aria-describedby="exampleFormControlInputHelpInline"
+                                        />
+                                    </CTableDataCell>
+                                </CTableRow>
+                                {result1.filter((list) => list.username === username && list.MemberName.toLowerCase().includes(Search1.toLowerCase()) && list.InvoiceNo.toLowerCase().includes(Search2.toLowerCase())
+                                    && list.ServiceName.toLowerCase().includes(Search3.toLowerCase()) && list.counseller.toLowerCase().includes(Search6.toLowerCase()) && list.totalAmount.toString().includes(Search7.toString())
+                                    && list.tax.toString().includes(Search8.toString()) && list.paidAmount.toString().includes(Search9.toString()) && list.pendingAmount.toString().includes(Search10.toString())
+                                    && list.paidAmount > 0)
                                     .map((item, index) => (
                                         <CTableRow key={index}>
                                             <CTableHeaderCell>{index + 1}</CTableHeaderCell>
                                             <CTableDataCell>{centerCode}MEM{index + 1}</CTableDataCell>
                                             <CTableDataCell>{item.MemberName}</CTableDataCell>
-                                            <CTableDataCell>{item.InvoiceNo}</CTableDataCell>
+                                            <CTableDataCell><label style={{ cursor: 'pointer' }} onClick={() => { setinvId(item._id), setCliId(item.MemberId), handleInvoice(item._id, item.MemberId) }}>{item.InvoiceNo}</label> </CTableDataCell>
                                             <CTableDataCell>{item.ServiceName}</CTableDataCell>
                                             <CTableDataCell>{moment(item.startDate).format("MM-DD-YYYY")}</CTableDataCell>
                                             <CTableDataCell>{moment(item.endDate).format("MM-DD-YYYY")}</CTableDataCell>
@@ -210,7 +314,7 @@ const PaidInvoice = () => {
                                             <CTableDataCell>{item.tax}%</CTableDataCell>
                                             <CTableDataCell>{item.paidAmount}</CTableDataCell>
                                             <CTableDataCell>{item.pendingAmount}</CTableDataCell>
-                                            <CTableDataCell><MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deleteData(item._id)} size='20px' /></CTableDataCell>
+                                            <CTableDataCell>{item.status === 'active' && <label style={{ backgroundColor: "#F1C40F", borderRadius: '10px', color: 'white', paddingLeft: '5px', paddingRight: '5px' }}>Pending</label>}{item.status === 'cancel' && <label style={{ backgroundColor: "red", borderRadius: '10px', paddingLeft: '5px', color: 'white', paddingRight: '5px' }}>Cancelled</label>} {item.status === 'done' && <label style={{ backgroundColor: "green", borderRadius: '10px', color: 'white', paddingLeft: '5px', paddingRight: '5px' }}>Paid</label>}</CTableDataCell>
                                         </CTableRow>
                                     ))}
                             </CTableBody>

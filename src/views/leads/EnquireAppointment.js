@@ -36,7 +36,14 @@ import AdmissionForm1 from 'src/components/AdmissionForm1'
 const url = 'https://yog-api.herokuapp.com'
 
 const EnquireAppointment = () => {
-    const [select, setSelect] = useState()
+
+    var currentdate = new Date();
+    var day = currentdate.getDay();
+    var month = currentdate.getMonth();
+    var year = currentdate.getFullYear();
+    console.log(month + 1);
+    console.log(day);
+    const [select, setSelect] = useState('')
     const [followForm, setFollowForm] = useState()
     const [edit, setEdit] = useState()
     const [visible1, setVisible1] = useState(false)
@@ -383,10 +390,11 @@ const EnquireAppointment = () => {
                                         value={select}
                                         onChange={(e) => setSelect(e.target.value)}
                                     >
-                                        <option>Today</option>
-                                        <option>Last Week</option>
-                                        <option>Last Month</option>
-                                        <option>Custom Date</option>
+                                        <option value={day - 1}>Today</option>
+                                        <option value={month + 1}>Last Month</option>
+                                        <option value={year}>This Year</option>
+                                        {/* <option>Last Week</option>
+                                        <option>Custom Date</option> */}
                                     </CFormSelect>
                                     {select === 'Custom Date' && (
                                         <CInputGroup className='mt-2 mb-2' >
@@ -416,11 +424,7 @@ const EnquireAppointment = () => {
                                         </CInputGroup>
 
                                     )}
-                                    {select !== 'Custom Date' && (
-                                        <CButton type="button" color="primary">
-                                            Go
-                                        </CButton>
-                                    )}
+
                                 </CInputGroup>
                             </CCol>
                             <CCol lg={6} sm={6} md={6}>
@@ -1287,7 +1291,7 @@ const EnquireAppointment = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username && list.appointmentfor === 'Appointment' && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
+                                    list.username === username && moment(list.createdAt).format("MM-DD-YYYY").includes(select) && list.appointmentfor === 'Appointment' && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
                                     list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
                                 ).map((item, index) => (
                                     item.username === username && (

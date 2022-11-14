@@ -344,38 +344,17 @@ const FollowupScheduling = () => {
                             </CInputGroup>
 
                         </div>
-                        <CRow className='d-flex justify-content-between mb-2'>
-
-                            <CCol lg={5} sm={6} md={6}>
-                                <CInputGroup className='mb-2' >
-                                    <CInputGroupText
-                                        component="label"
-                                        htmlFor="inputGroupSelect01"
-                                    >
-                                        Communicate
-                                    </CInputGroupText>
-                                    <CFormSelect id="inputGroupSelect01">
-                                        <option>All Staff</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </CFormSelect>
-                                </CInputGroup>
-                            </CCol>
-
-                            <CCol lg={6} sm={6} md={6}>
-                                <div className='d-flex justify-content-between float-end'>
-                                    <CButtonGroup style={{ fontSize: '11px' }} role="group" aria-label="Basic example">
-                                        <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Scheduled: 0</CButton>
-                                        <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Attented: 0</CButton>
-                                        <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Rescheduled:0</CButton>
-                                        <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Prospect: 0</CButton>
-                                        <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Missed: 0</CButton>
-                                    </CButtonGroup>
-
-                                </div>
-                            </CCol>
-                        </CRow>
+                        <div className='d-flex justify-content-between mb-2'>
+                            <div className='d-flex justify-content-between float-end'>
+                                <CButtonGroup style={{ fontSize: '11px' }} role="group" aria-label="Basic example">
+                                    <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Scheduled: 0</CButton>
+                                    <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Attented: 0</CButton>
+                                    <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Rescheduled:0</CButton>
+                                    <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Prospect: 0</CButton>
+                                    <CButton style={{ fontSize: '11px' }} color="dark" variant="outline">Missed: 0</CButton>
+                                </CButtonGroup>
+                            </div>
+                        </div>
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={callReport} color='' onClose={() => setCallReport(false)} >
                             <CModalHeader  >
                                 <CModalTitle>Call Report</CModalTitle>

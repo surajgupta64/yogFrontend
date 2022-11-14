@@ -36,7 +36,14 @@ import AdmissionForm1 from 'src/components/AdmissionForm1'
 const url = 'https://yog-api.herokuapp.com'
 
 const ColdEnquires = () => {
-    const [select, setSelect] = useState()
+
+    var currentdate = new Date();
+    var day = currentdate.getDay();
+    var month = currentdate.getMonth();
+    var year = currentdate.getFullYear();
+    console.log(month + 1);
+    console.log(day);
+    const [select, setSelect] = useState('')
     const [followForm, setFollowForm] = useState()
     const [edit, setEdit] = useState()
     const [callReport, setCallReport] = useState(false)
@@ -376,7 +383,49 @@ const ColdEnquires = () => {
                     <CCardBody>
                         <CRow className='d-flex justify-content-between'>
                             <CCol lg={4} sm={6} md={6}>
+                                <CInputGroup className='mb-2'>
+                                    <CFormSelect
+                                        id="inputGroupSelect04"
+                                        aria-label="Example select with button addon"
+                                        value={select}
+                                        onChange={(e) => setSelect(e.target.value)}
+                                    >
+                                        <option value={day - 1}>Today</option>
+                                        <option value={month + 1}>Last Month</option>
+                                        <option value={year}>This Year</option>
+                                        {/* <option>Last Week</option>
+                                        <option>Custom Date</option> */}
+                                    </CFormSelect>
+                                    {select === 'Custom Date' && (
+                                        <CInputGroup className='mt-2 mb-2' >
 
+                                            <CInputGroupText
+                                                component="label"
+                                                htmlFor="inputGroupSelect01"
+                                            >
+                                                Form
+                                            </CInputGroupText>
+                                            <CFormInput
+                                                type="date"
+                                                required
+                                            /><CInputGroupText
+                                                component="label"
+                                                htmlFor="inputGroupSelect01"
+                                            >
+                                                To
+                                            </CInputGroupText>
+                                            <CFormInput
+                                                type="date"
+                                                required
+                                            />
+                                            <CButton type="button" color="primary">
+                                                Go
+                                            </CButton>
+                                        </CInputGroup>
+
+                                    )}
+
+                                </CInputGroup>
                             </CCol>
                             <CCol lg={6} sm={6} md={6}>
                                 <CButtonGroup className=' mb-2 float-end'>
@@ -1171,7 +1220,7 @@ const ColdEnquires = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username && list.CallStatus === 'Cold' && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) &&
+                                    list.username === username && moment(list.createdAt).format("MM-DD-YYYY").includes(select) && list.CallStatus === 'Cold' && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) &&
                                     list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
                                     && list.StaffName.toLowerCase().includes(Search9.toLowerCase())
                                 ).map((item, index) => (
@@ -1179,7 +1228,7 @@ const ColdEnquires = () => {
                                         <CTableRow key={index}>
                                             <CTableDataCell>{index + 1}</CTableDataCell>
                                             <CTableDataCell>{centerCode}ENQ{index + 10}</CTableDataCell>
-                                            <CTableDataCell className='text-center'>{moment(item.createdAt).format("LL")}</CTableDataCell>
+                                            <CTableDataCell className='text-center'>{moment(item.createdAt).format("MM-DD-YYYY")}</CTableDataCell>
                                             <CTableDataCell>{moment(item.createdAt, "HH:mm").format("hh:mm A")}</CTableDataCell>
                                             <CTableDataCell>{item.Fullname}</CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>

@@ -36,7 +36,13 @@ import AdmissionForm1 from 'src/components/AdmissionForm1'
 const url = 'https://yog-api.herokuapp.com'
 
 const TrialEnquires = () => {
-    const [select, setSelect] = useState()
+    var currentdate = new Date();
+    var day = currentdate.getDay();
+    var month = currentdate.getMonth();
+    var year = currentdate.getFullYear();
+    console.log(month + 1);
+    console.log(day);
+    const [select, setSelect] = useState('')
     const [followForm, setFollowForm] = useState()
     const [admissionForm, setAdmissionForm] = useState(false)
     const [edit, setEdit] = useState()
@@ -383,10 +389,11 @@ const TrialEnquires = () => {
                                         value={select}
                                         onChange={(e) => setSelect(e.target.value)}
                                     >
-                                        <option>Today</option>
-                                        <option>Last Week</option>
-                                        <option>Last Month</option>
-                                        <option>Custom Date</option>
+                                        <option value={day - 1}>Today</option>
+                                        <option value={month + 1}>Last Month</option>
+                                        <option value={year}>This Year</option>
+                                        {/* <option>Last Week</option>
+                                        <option>Custom Date</option> */}
                                     </CFormSelect>
                                     {select === 'Custom Date' && (
                                         <CInputGroup className='mt-2 mb-2' >
@@ -416,11 +423,7 @@ const TrialEnquires = () => {
                                         </CInputGroup>
 
                                     )}
-                                    {select !== 'Custom Date' && (
-                                        <CButton type="button" color="primary">
-                                            Go
-                                        </CButton>
-                                    )}
+
                                 </CInputGroup>
                             </CCol>
                             <CCol lg={6} sm={6} md={6}>
@@ -1277,15 +1280,15 @@ const TrialEnquires = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username && list.appointmentfor === 'Trial Session' && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
+                                    list.username === username && moment(list.createdAt).format("MM-DD-YYYY").includes(select) && list.appointmentfor === 'Trial Session' && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
                                     list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
                                 ).map((item, index) => (
                                     item.username === username && (
                                         <CTableRow key={index}>
                                             <CTableDataCell>{index + 1}</CTableDataCell>
                                             <CTableDataCell>{centerCode}ENQ{index + 10}</CTableDataCell>
-                                            <CTableDataCell className='text-center'>{moment(item.appointmentDate).format("LL")}</CTableDataCell>
-                                            <CTableDataCell>{moment(item.appointmentTime, "HH:mm").format("hh:mm A")}</CTableDataCell>
+                                            <CTableDataCell className='text-center'>{moment(item.createdAt).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.createdAt, "HH:mm").format("hh:mm A")}</CTableDataCell>
                                             <CTableDataCell>{item.Fullname}</CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>
                                             <CTableDataCell>{item.ServiceName}</CTableDataCell>

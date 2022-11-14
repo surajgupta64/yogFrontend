@@ -1400,7 +1400,7 @@ const AllClients = () => {
                                             <CTableDataCell>{centerCode}MEM{index + 10}</CTableDataCell>
                                             <CTableDataCell>{item.Fullname}</CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>
-                                            <CTableDataCell> <label style={{ cursor: 'pointer' }} onClick={() => { setinvId(item.invoiceId), setCliId(item._id), handleInvoice(item.invoiceId, item._id) }}>{item.invoiceNum}</label> </CTableDataCell>
+                                            <CTableDataCell><label style={{ cursor: 'pointer' }} onClick={() => { setinvId(item.invoiceId), setCliId(item._id), handleInvoice(item.invoiceId, item._id) }}>{item.invoiceNum}</label> </CTableDataCell>
                                             <CTableDataCell>{item.AttendanceID}</CTableDataCell>
                                             <CTableDataCell>{item.serviceName}</CTableDataCell>
                                             <CTableDataCell>{moment(item.startDate).format("MM-DD-YYYY")}</CTableDataCell>

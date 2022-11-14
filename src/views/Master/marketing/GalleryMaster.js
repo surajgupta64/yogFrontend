@@ -22,6 +22,7 @@ import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { MdDelete } from "react-icons/md";
+import { storage } from "src/firebase";
 import { v4 } from "uuid";
 const url = 'https://yog-api.herokuapp.com'
 
@@ -72,43 +73,35 @@ const GalleryMaster = () => {
     }
 
     function createGallery() {
-        if (galleryType === 'Image') {
-
-            const uploadTask = ref(storage, `galleryMaster/${image.name + v4()}`);
-            uploadTask.on('state_changed',
-                (snapshot) => {
-                    // progrss function ....
-                    const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                    setProcess(progress);
-                },
-                (error) => {
-                    // error function ....
-                    console.log(error);
-                },
-                () => {
-                    // complete function ....
-                    storage.ref('galleryMaster').child(image.name).getDownloadURL().then(url => {
-                        console.log(url);
-                        setImageUrl(url)
-                    })
+        if (galleryType === 'Center Image' || galleryType === 'Trainer Image') {
+            const imageRef = ref(storage, `images/${image.name + v4()}`);
+            uploadBytes(imageRef, image).then((snapshot) => {
+                getDownloadURL(snapshot.ref).then((url) => {
+                    setImageUrl(url)
+                    console.log(url);
                 });
-            const data = {
-                username: username,
-                Name: name,
-                galleryType,
-                Description: description,
-                image: imageUrl,
+            });
+            if (imageUrl != null) {
+
+                const data = {
+                    username: username,
+                    Name: name,
+                    galleryType,
+                    Description: description,
+                    image: imageUrl,
+                }
+                axios.post(`${url}/galleryMaster/create`, data, { headers })
+                    .then((resp) => {
+                        console.log(resp.data)
+                        alert('Successfully Added')
+                        getGallery()
+                        setAction1(false)
+                        setName('')
+                        setImageUrl('')
+                        setDescription('')
+                    })
+                    .catch((error) => console.log(error))
             }
-            axios.post(`${url}/galleryMaster/create`, data, { headers })
-                .then((resp) => {
-                    console.log(resp.data)
-                    alert('Successfully Added')
-                    getGallery()
-                    setAction1(false)
-                    setName('')
-                    setDescription('')
-                })
-                .catch((error) => console.log(error))
 
         } else {
 
@@ -185,12 +178,12 @@ const GalleryMaster = () => {
                                         value={galleryType}
                                         onChange={(e) => setGalleryType(e.target.value)}
                                     >
-                                        <option value="">Select</option>
-                                        <option value="Url">Instagram Url</option>
-                                        <option value="Url">Facebook Url</option>
-                                        <option value="Url">Youtube Url</option>
-                                        <option value="Image">Trainer Image</option>
-                                        <option value="Image">Center Image</option>
+                                        <option >Select</option>
+                                        <option >Instagram Url</option>
+                                        <option >Facebook Url</option>
+                                        <option >Youtube Url</option>
+                                        <option >Trainer Image</option>
+                                        <option >Center Image</option>
                                     </CFormSelect>
                                 </CCol>
                                 <CCol lg={6} md={6} sm={12}>

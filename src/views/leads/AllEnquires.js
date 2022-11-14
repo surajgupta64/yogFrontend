@@ -409,10 +409,10 @@ const AllEnquires = () => {
                                         onChange={(e) => setSelect(e.target.value)}
                                     >
                                         <option value={day - 1}>Today</option>
-                                        <option>Last Week</option>
                                         <option value={month + 1}>Last Month</option>
                                         <option value={year}>This Year</option>
-                                        <option>Custom Date</option>
+                                        {/* <option>Last Week</option>
+                                        <option>Custom Date</option> */}
                                     </CFormSelect>
                                     {select === 'Custom Date' && (
                                         <CInputGroup className='mt-2 mb-2' >
@@ -442,11 +442,7 @@ const AllEnquires = () => {
                                         </CInputGroup>
 
                                     )}
-                                    {select !== 'Custom Date' && (
-                                        <CButton type="button" color="primary">
-                                            Go
-                                        </CButton>
-                                    )}
+
                                 </CInputGroup>
                             </CCol>
                             <CCol lg={6} sm={6} md={6}>
@@ -1408,7 +1404,7 @@ const AllEnquires = () => {
                                     </CTableDataCell>
                                 </CTableRow>
                                 {result1.filter((list) =>
-                                    list.username === username && moment(list.appointmentDate).format("MM-DD-YYYY").includes(select) && moment(list.appointmentDate).format("MM-DD-YYYY").includes(Search1) && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
+                                    list.username === username && moment(list.createdAt).format("MM-DD-YYYY").includes(select) && moment(list.createdAt).format("MM-DD-YYYY").includes(Search1) && list.Fullname.toLowerCase().includes(Search3.toLowerCase()) && list.StaffName.toLowerCase().includes(Search9.toLowerCase()) &&
                                     list.ServiceName.toLowerCase().includes(Search5.toLowerCase()) && list.enquirytype.toLowerCase().includes(Search6.toLowerCase()) && list.CallStatus.toLowerCase().includes(Search8.toLowerCase())
                                 ).map((item, index) => (
                                     item.username === username && (

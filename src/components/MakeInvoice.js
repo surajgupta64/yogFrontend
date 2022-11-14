@@ -553,8 +553,8 @@ const MakeInvoice = () => {
                                                                     options={[
                                                                         { label: "Select", value: "0" },
                                                                         { label: "GST", value: "18" },
-                                                                        { label: "IGST", value: "18" },
-                                                                        { label: "CGST", value: "18" },
+                                                                        { label: "IGST", value: "9" },
+                                                                        { label: "CGST", value: "9" },
                                                                         { label: "TDS", value: "18" },
                                                                     ]}
                                                                 /></CCol>
@@ -575,7 +575,7 @@ const MakeInvoice = () => {
                                                         <CFormInput
                                                             className="mb-1"
                                                             type="number"
-                                                            value={total}
+                                                            value={total - discount}
                                                             style={{ minWidth: "100px" }}
                                                             aria-describedby="exampleFormControlInputHelpInline"
                                                         />
@@ -589,7 +589,7 @@ const MakeInvoice = () => {
                                                             className="mb-1"
                                                             type="number"
                                                             value={paidAmount}
-                                                            onChange={(e) => { setpaidAmount(e.target.value), setPendingAmount(total - e.target.value), setFinalTotal(e.target.value) }}
+                                                            onChange={(e) => { setpaidAmount(e.target.value), setPendingAmount(total - e.target.value - discount), setFinalTotal(e.target.value) }}
                                                             style={{ minWidth: "100px" }}
                                                             aria-describedby="exampleFormControlInputHelpInline"
                                                         />
@@ -602,7 +602,7 @@ const MakeInvoice = () => {
                                                             className="mb-1"
                                                             type="number"
                                                             value={pendingAmount}
-                                                            onChange={(e) => { setPendingAmount(e.target.value), setpaidAmount(total - e.target.value), setFinalTotal(total - e.target.value) }}
+                                                            onChange={(e) => { setPendingAmount(e.target.value), setpaidAmount(total - e.target.value - discount), setFinalTotal(total - e.target.value - discount) }}
                                                             style={{ minWidth: "100px" }}
                                                             aria-describedby="exampleFormControlInputHelpInline"
                                                         />

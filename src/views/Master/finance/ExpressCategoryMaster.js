@@ -21,6 +21,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 const url = 'https://yog-api.herokuapp.com'
+const url2 = 'https://yoga-power-node-api.herokuapp.com'
 
 const ExpressCategoryMaster = () => {
     const [action1, setAction1] = useState(false)
@@ -39,7 +40,23 @@ const ExpressCategoryMaster = () => {
     };
     useEffect(() => {
         getExpress()
+        getStaff()
     }, []);
+    const [staff, setStaff] = useState([])
+    function getStaff() {
+        axios.get(`${url2}/employeeForm/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setStaff(res.data)
+                console.log(res.data);
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
     function getExpress() {
         axios.get(`${url}/expenseMaster/all`, {
@@ -62,7 +79,7 @@ const ExpressCategoryMaster = () => {
                 username: username,
                 CategoryName: Category,
                 ApprovalLevel1: level1,
-                ApprovalLevel1: level2,
+                ApprovalLevel2: level2,
             }
             axios.post(`${url}/expenseMaster/create`, data, { headers })
                 .then((resp) => {
@@ -151,28 +168,38 @@ const ExpressCategoryMaster = () => {
                                 </CCol>
                                 {level >= 1 &&
                                     <CCol lg={6} md={6} sm={12}>
-                                        <CFormInput
+                                        <CFormSelect
                                             className="mb-1"
-                                            type="text"
-                                            id="exampleFormControlInput1"
+                                            aria-label="Select Assign Staff"
                                             label="Approval level-1"
                                             value={level1}
                                             onChange={(e) => setLevel1(e.target.value)}
-                                            placeholder="Staff Name"
-                                        />
+                                        >
+                                            <option>Select Staff</option>
+                                            {staff.filter((list) => list.username === username).map((item, index) => (
+                                                item.username === username && (
+                                                    <option key={index}>{item.FullName}</option>
+                                                )
+                                            ))}
+                                        </CFormSelect>
                                     </CCol>
                                 }
                                 {level >= 2 &&
                                     <CCol lg={6} md={6} sm={12}>
-                                        <CFormInput
+                                        <CFormSelect
                                             className="mb-1"
-                                            type="text"
-                                            id="exampleFormControlInput1"
+                                            aria-label="Select Assign Staff"
                                             label="Approval level-2"
                                             value={level2}
                                             onChange={(e) => setLevel2(e.target.value)}
-                                            placeholder="Staff Name"
-                                        />
+                                        >
+                                            <option>Select Staff</option>
+                                            {staff.filter((list) => list.username === username).map((item, index) => (
+                                                item.username === username && (
+                                                    <option key={index}>{item.FullName}</option>
+                                                )
+                                            ))}
+                                        </CFormSelect>
                                     </CCol>
                                 }
                                 <CCol className="mt-2" lg={6} md={6} sm={12}>
