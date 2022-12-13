@@ -19,7 +19,8 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
-const url = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const BudgetingMaster = () => {
     const [action1, setAction1] = useState(false)

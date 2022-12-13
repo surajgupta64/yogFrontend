@@ -200,11 +200,6 @@ const _nav = [
         name: 'Multi Service Clients',
         to: '/client-management/multi-clients',
       },
-      {
-        component: CNavItem,
-        name: 'Member Details',
-        to: '/clients/member-details',
-      },
     ],
   },
   {

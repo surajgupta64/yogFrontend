@@ -6,6 +6,8 @@ import {
     CForm,
     CFormInput,
     CFormTextarea,
+    CPagination,
+    CPaginationItem,
     CRow,
     CTable,
     CTableBody,
@@ -47,6 +49,7 @@ const AllSuppilerList = () => {
     const token = user.token;
     const username = user.user.username;
     const centerCode = user.user.centerCode;
+    const [paging, setPaging] = useState(0);
     useEffect(() => {
         getImpCall()
     }, [])
@@ -58,7 +61,7 @@ const AllSuppilerList = () => {
             }
         })
             .then((res) => {
-                setResult1(res.data)
+                setResult1(res.data.reverse())
                 console.log(res.data);
             })
             .catch((error) => {
@@ -111,18 +114,21 @@ const AllSuppilerList = () => {
     }
 
     function deleteCall(id) {
-        fetch(`${url}/suppilerCallList/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }).then((result) => {
-            result.json().then(() => {
-                getImpCall()
+
+        if (confirm('Do you want to delete this')) {
+            fetch(`${url}/suppilerCallList/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then(() => {
+                    getImpCall()
+                })
             })
-        })
+        }
     }
 
     const handleUpdate = (id) => {
@@ -363,12 +369,12 @@ const AllSuppilerList = () => {
                             />
                         </CTableDataCell>
                     </CTableRow>
-                    {result1.filter((list) =>
+                    {result1.slice(paging * 10, paging * 10 + 10).filter((list) =>
                         list.username === username && list.name.includes(search1) && list.mobile.toString().includes(search2.toString()) && list.email.includes(search3)
                         && list.address.includes(search4) && list.category.includes(search5) && list.company.includes(search6)
                     ).map((item, index) => (
                         <CTableRow key={index}>
-                            <CTableDataCell>{index + 1}</CTableDataCell>
+                            <CTableDataCell>{index + 1 + (paging * 10)}</CTableDataCell>
                             <CTableDataCell>{item.name}</CTableDataCell>
                             <CTableDataCell>{item.mobile}</CTableDataCell>
                             <CTableDataCell>{item.email}</CTableDataCell>
@@ -381,6 +387,32 @@ const AllSuppilerList = () => {
                     ))}
                 </CTableBody>
             </CTable>
+            <CPagination aria-label="Page navigation example" align="center" className='mt-2'>
+                <CPaginationItem aria-label="Previous" disabled={paging != 0 ? false : true} onClick={() => paging > 0 && setPaging(paging - 1)}>
+                    <span aria-hidden="true">&laquo;</span>
+                </CPaginationItem>
+                <CPaginationItem active onClick={() => setPaging(0)}>{paging + 1}</CPaginationItem>
+                {result1.filter((list) =>
+                    list.username === username && list.name.includes(search1) && list.mobile.toString().includes(search2.toString()) && list.email.includes(search3)
+                    && list.address.includes(search4) && list.category.includes(search5) && list.company.includes(search6)
+                ).length > (paging + 1) * 10 && <CPaginationItem onClick={() => setPaging(paging + 1)} >{paging + 2}</CPaginationItem>}
+
+                {result1.filter((list) =>
+                    list.username === username && list.name.includes(search1) && list.mobile.toString().includes(search2.toString()) && list.email.includes(search3)
+                    && list.address.includes(search4) && list.category.includes(search5) && list.company.includes(search6)
+                ).length > (paging + 2) * 10 && <CPaginationItem onClick={() => setPaging(paging + 2)}>{paging + 3}</CPaginationItem>}
+                {result1.filter((list) =>
+                    list.username === username && list.name.includes(search1) && list.mobile.toString().includes(search2.toString()) && list.email.includes(search3)
+                    && list.address.includes(search4) && list.category.includes(search5) && list.company.includes(search6)
+                ).length > (paging + 1) * 10 ?
+                    <CPaginationItem aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                        <span aria-hidden="true">&raquo;</span>
+                    </CPaginationItem>
+                    : <CPaginationItem disabled aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                        <span aria-hidden="true">&raquo;</span>
+                    </CPaginationItem>
+                }
+            </CPagination>
         </CRow>
 
     );

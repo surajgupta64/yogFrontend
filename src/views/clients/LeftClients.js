@@ -19,6 +19,8 @@ import {
     CModalFooter,
     CModalHeader,
     CModalTitle,
+    CPagination,
+    CPaginationItem,
     CRow,
     CTable,
     CTableBody,
@@ -35,8 +37,9 @@ import { BsPlusCircle, BsWhatsapp } from 'react-icons/bs'
 import moment from 'moment/moment'
 import ViewInvoice from 'src/components/ViewInvoice'
 import CallUpdate from 'src/components/CallUpdate'
-const url = 'https://yog-api.herokuapp.com'
-const url2 = 'https://yoga-power-node-api.herokuapp.com'
+import { Link } from 'react-router-dom'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const LeftClients = () => {
     const [select, setSelect] = useState()
@@ -66,6 +69,7 @@ const LeftClients = () => {
     const [ServiceName1, setServiceName1] = useState("");
     const [CallStatus1, setCallStatus1] = useState("");
     const [FollowupDate, setFollowupDate] = useState("");
+    const [enquiryStage, setEnquiryStage] = useState('')
     const [TimeFollowp, setTimeFollowp] = useState("");
     const [Discussion, setDiscussion] = useState("");
     const [Counseller, setCounseller] = useState("");
@@ -112,6 +116,7 @@ const LeftClients = () => {
     console.log(token);
     const [result, setResult] = useState([]);
     const [updateItem, setUpdateItem] = useState([]);
+    const [paging, setPaging] = useState(0);
     useEffect(() => {
         getEnquiry()
         getStaff()
@@ -146,7 +151,7 @@ const LeftClients = () => {
     }
 
     function updateRec(id, status) {
-        const data1 = { plan: status }
+        const data1 = { status: status }
         fetch(`${url}/memberForm/update/${id}`, {
             method: "POST",
             headers: {
@@ -161,8 +166,6 @@ const LeftClients = () => {
             })
         })
     }
-
-
 
     const saveEnquiry = () => {
         let data = {
@@ -223,7 +226,7 @@ const LeftClients = () => {
             + currentdate.getMinutes();
         let data = {
             EnquiryID: followForm, CallDate: date, Time: time,
-            Name: Name, Contact: Contact, Email: email, ServiceName: ServiceName1, CallStatus: CallStatus1, FollowupDate: FollowupDate, TimeFollowp: TimeFollowp, Counseller: Counseller, Discussion: Discussion,
+            Name: Name, Contact: Contact, Email: email, ServiceName: ServiceName1, AppointmentDate: appointmentDate, AppointmentTime: appointmentTime, enquiryStage: enquiryStage, CallStatus: CallStatus1, FollowupDate: FollowupDate, TimeFollowp: TimeFollowp, Counseller: Counseller, Discussion: Discussion,
         }
 
         fetch(`${url}/prospect/create`, {
@@ -241,6 +244,7 @@ const LeftClients = () => {
             })
         })
     }
+    const [ogList, setOgList] = useState([])
     function getEnquiry() {
         axios.get(`${url}/memberForm/all`, {
             headers: {
@@ -248,11 +252,30 @@ const LeftClients = () => {
             }
         })
             .then((res) => {
-                setResult1(res.data)
+                setResult1(res.data.filter((list) => list.username === username).reverse())
+                setOgList(res.data.filter((list) => list.username === username).reverse())
             })
             .catch((error) => {
                 console.error(error)
             })
+    }
+    const [filterBy, setFilterBy] = useState('')
+    const [subFilter, setSubFilter] = useState('')
+    const [arr, setArr] = useState([])
+    function getUnique(arr, index) {
+        const unique = arr
+            .map(e => e[index])
+            // store the keys of the unique objects
+            .map((e, i, final) => final.indexOf(e) === i && i)
+            // eliminate the dead keys & store unique objects
+            .filter(e => arr[e]).map(e => arr[e]);
+        return unique;
+    }
+    function filterArr(og, v) {
+        if (v === '')
+            setResult1(og)
+        else
+            setResult1(og.filter((list) => list[filterBy] === v))
     }
     function getUpdate(id) {
         axios.get(`${url}/memberForm/${id}`, {
@@ -315,19 +338,22 @@ const LeftClients = () => {
 
 
     function deleteEnquiry(id) {
-        fetch(`${url}/memberForm/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }).then((result) => {
-            result.json().then((resp) => {
-                console.warn(resp)
-                getEnquiry()
+
+        if (confirm('Do you want to delete this')) {
+            fetch(`${url}/memberForm/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then((resp) => {
+                    console.warn(resp)
+                    getEnquiry()
+                })
             })
-        })
+        }
     }
 
     const handleFollowup = (id) => {
@@ -393,6 +419,12 @@ const LeftClients = () => {
             })
         })
     }
+    var currentdate = new Date();
+    var day = currentdate.getDate() + '-' + (currentdate.getMonth() + 1) + '-' + currentdate.getFullYear();
+    var month = currentdate.getMonth() + '-' + currentdate.getFullYear();
+    var year = currentdate.getFullYear();
+
+
     const [invId, setinvId] = useState()
     const [cliId, setCliId] = useState()
     function handleInvoice(inId, clId) {
@@ -448,10 +480,9 @@ const LeftClients = () => {
                                         value={select}
                                         onChange={(e) => setSelect(e.target.value)}
                                     >
-                                        <option>Today</option>
-                                        <option>Last Week</option>
-                                        <option>Last Month</option>
-                                        <option>Custom Date</option>
+                                        <option value={day}>Today</option>
+                                        <option value={month - 1}>Last Month</option>
+                                        <option value={year}>Year</option>
                                     </CFormSelect>
                                     {select === 'Custom Date' && (
                                         <CInputGroup className='mt-2 mb-2' >
@@ -500,6 +531,42 @@ const LeftClients = () => {
                                     </CButton>
                                 </CButtonGroup>
                             </CCol>
+                            <CCol xs={3}>
+                                <CFormSelect
+                                    className="mb-1"
+                                    aria-label="Select Service Name"
+                                    value={filterBy}
+                                    onChange={(e) => { setFilterBy(e.target.value); setArr(getUnique(ogList, e.target.value)) }}
+                                    label="Filter By"
+
+                                >
+                                    <option value=''>Select</option>
+                                    <option value='AssignStaff'>Assign Staff </option>
+                                    <option value='EnquiryType'>Lead Sources </option>
+                                    <option value='MemberManager'>Member Manager </option>
+                                    <option value='serviceName'>Services Name </option>
+                                    <option value='Customertype'>Customer Type </option>
+                                    <option value='Gender'>Gender</option>
+                                </CFormSelect>
+                            </CCol>
+                            <CCol xs={3}>
+                                <CFormSelect
+                                    className="mb-1"
+                                    aria-label="Select Service Name"
+                                    value={subFilter}
+                                    onChange={(e) => { setSubFilter(e.target.value); filterArr(ogList, e.target.value) }}
+                                    label="Sub-filter"
+
+                                >
+                                    <option value=''>Select</option>
+                                    {arr.filter((list) => list[filterBy] != '').map((item, index) => (
+                                        item.username === username && (
+                                            <option key={index} value={item.id}>{item[filterBy]}</option>
+                                        )
+                                    ))}
+                                </CFormSelect>
+                            </CCol>
+                            <CCol></CCol>
                         </CRow>
 
                         {/*  <CRow className='mb-3'>
@@ -624,7 +691,7 @@ const LeftClients = () => {
                                                 {result.map((item, index) => (
                                                     item.username === username && (
                                                         item.status === true && (
-                                                            <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                            <option key={index} value={item.id}>{item.selected_service}</option>
                                                         )
                                                     )
                                                 ))}
@@ -706,7 +773,7 @@ const LeftClients = () => {
 
                         <CModal size='lg' style={{ border: '2px solid #0B5345' }} visible={visible} color='' onClose={() => setVisible(false)} >
                             <CModalHeader  >
-                                <CModalTitle>Prospect Form</CModalTitle>
+                                <CModalTitle>Upgrade Form</CModalTitle>
                             </CModalHeader>
                             <CModalBody>
                                 <CForm >
@@ -746,7 +813,7 @@ const LeftClients = () => {
                                                 placeholder="Enter Number"
                                             />
                                         </CCol>
-                                        <CCol lg={6} md={6} sm={12}>
+                                        <CCol lg={4} md={6} sm={12}>
                                             <CFormSelect
                                                 className="mb-1"
                                                 aria-label="Select Service Name"
@@ -759,24 +826,70 @@ const LeftClients = () => {
                                                 {result.map((item, index) => (
                                                     item.username === username && (
                                                         item.status === true && (
-                                                            <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                            <option key={index} value={item.id}>{item.selected_service}</option>
                                                         )
                                                     )
                                                 ))}
                                             </CFormSelect>
                                         </CCol>
-                                        <CCol lg={6} md={6} sm={12}>
-                                            <CFormInput
+                                        <CCol lg={4} md={6} sm={12}>
+
+                                            <CFormSelect
                                                 className="mb-1"
-                                                type="text"
+                                                aria-label="Select Assign Staff"
                                                 value={Counseller}
                                                 onChange={(e) => setCounseller(e.target.value)}
-                                                id="exampleFormControlInput1"
-                                                label="Counseller"
-                                                placeholder="Enter Counseller Name"
+                                                label='Counseller'
+                                            >
+                                                <option>Select Counseller</option>
+                                                {staff.filter((list) => list.username === username && list.selected === 'Select').map((item, index) => (
+                                                    item.username === username && (
+                                                        <option key={index}>{item.FullName}</option>
+                                                    )
+                                                ))}</CFormSelect>
+                                        </CCol>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormSelect
+                                                className="mb-1"
+                                                aria-label="Select Call Status"
+                                                value={enquiryStage}
+                                                onChange={(e) => setEnquiryStage(e.target.value)}
+                                                label="Prospect Stage"
+                                                options={[
+                                                    "Select",
+                                                    { label: "Appointment", value: "Appointment" },
+                                                    { label: "Trial Session", value: "Trial Session" },
+                                                    { label: "Join", value: "Join" },
+                                                    { label: 'Enquiry', value: 'Enquiry' }
+                                                ]}
                                             />
                                         </CCol>
 
+                                        {(enquiryStage === 'Appointment' || enquiryStage === 'Trial Session') &&
+                                            <>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="Appointment Date"
+                                                        type="date"
+                                                        value={appointmentDate}
+                                                        onChange={(e) => setappointmentDate(e.target.value)}
+                                                        id="exampleFormControlInput1"
+                                                    />
+                                                </CCol>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="Appointment Time"
+                                                        type="time"
+                                                        id="exampleFormControlInput1"
+                                                        value={appointmentTime}
+                                                        onChange={(e) => setappointmentTime(e.target.value)}
+
+                                                    />
+                                                </CCol>
+                                            </>
+                                        }
                                         <CCol lg={4} md={6} sm={12}>
                                             <CFormSelect
                                                 className="mb-1"
@@ -792,27 +905,32 @@ const LeftClients = () => {
                                                 ]}
                                             />
                                         </CCol>
-                                        <CCol lg={4} md={6} sm={12}>
-                                            <CFormInput
-                                                className="mb-1"
-                                                label="FollowUp Date"
-                                                type="date"
-                                                value={FollowupDate}
-                                                onChange={(e) => setFollowupDate(e.target.value)}
-                                                id="exampleFormControlInput1"
-                                            />
-                                        </CCol>
-                                        <CCol lg={4} md={6} sm={12}>
-                                            <CFormInput
-                                                className="mb-1"
-                                                label="FollowUp Time"
-                                                type="time"
-                                                id="exampleFormControlInput1"
-                                                value={TimeFollowp}
-                                                onChange={(e) => setTimeFollowp(e.target.value)}
+                                        {(enquiryStage === 'Join' || enquiryStage === 'Enquiry') &&
+                                            <>
 
-                                            />
-                                        </CCol>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="FollowUp Date"
+                                                        type="date"
+                                                        value={FollowupDate}
+                                                        onChange={(e) => setFollowupDate(e.target.value)}
+                                                        id="exampleFormControlInput1"
+                                                    />
+                                                </CCol>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="FollowUp Time"
+                                                        type="time"
+                                                        id="exampleFormControlInput1"
+                                                        value={TimeFollowp}
+                                                        onChange={(e) => setTimeFollowp(e.target.value)}
+
+                                                    />
+                                                </CCol>
+                                            </>
+                                        }
                                         <CCol>
                                             <CFormTextarea
                                                 id="exampleFormControlTextarea1"
@@ -1079,7 +1197,7 @@ const LeftClients = () => {
                                                         {result.map((item, index) => (
                                                             item.username === username && (
                                                                 item.status === true && (
-                                                                    <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                                    <option key={index} value={item.id}>{item.selected_service}</option>
                                                                 )
                                                             )
                                                         ))}
@@ -1188,7 +1306,7 @@ const LeftClients = () => {
                                     <CTableHeaderCell>End Date</CTableHeaderCell>
                                     <CTableHeaderCell>Fitness Goal</CTableHeaderCell>
                                     <CTableHeaderCell>Appointments</CTableHeaderCell>
-                                    <CTableHeaderCell>Call Update</CTableHeaderCell>
+                                    <CTableHeaderCell>Type of Call</CTableHeaderCell>
                                     <CTableHeaderCell>Status</CTableHeaderCell>
                                     <CTableHeaderCell>Action</CTableHeaderCell>
                                     <CTableHeaderCell>Edit</CTableHeaderCell>
@@ -1261,6 +1379,7 @@ const LeftClients = () => {
                                         <CFormInput
                                             className="mb-1"
                                             type="text"
+                                            style={{ minWidth: "100px" }}
                                             value={Search5}
                                             onChange={(e) => setSearch5(e.target.value)}
                                             aria-describedby="exampleFormControlInputHelpInline"
@@ -1271,7 +1390,7 @@ const LeftClients = () => {
                                             className="mb-1"
                                             type="text"
                                             disabled
-                                            style={{ minWidth: "80px" }}
+                                            style={{ minWidth: "100px" }}
                                             value={Search6}
                                             onChange={(e) => setSearch6(e.target.value)}
                                             aria-describedby="exampleFormControlInputHelpInline"
@@ -1349,29 +1468,28 @@ const LeftClients = () => {
                                         />
                                     </CTableDataCell>
                                 </CTableRow>
-                                {result1.filter((list) =>
+                                {result1.slice(paging * 10, paging * 10 + 10).filter((list) =>
                                     list.username === username && list.plan === false
                                     && list.Fullname.toLowerCase().includes(Search1.toLowerCase()) &&
                                     list.AttendanceID.toLowerCase().includes(Search5.toLowerCase()) && list.serviceName.toLowerCase().includes(Search6.toLowerCase()) && list.fitnessGoal.toLowerCase().includes(Search7.toLowerCase())
-
                                 ).map((item, index) => (
                                     item.username === username && (
                                         <CTableRow key={index}>
-                                            <CTableDataCell>{index + 1}</CTableDataCell>
-                                            <CTableDataCell>{centerCode}MEM{index + 10}</CTableDataCell>
-                                            <CTableDataCell>{item.Fullname}</CTableDataCell>
+                                            <CTableDataCell>{index + 1 + (paging * 10)}</CTableDataCell>
+                                            <CTableDataCell>{centerCode}MEM{index + 10 + (paging * 10)}</CTableDataCell>
+                                            <CTableDataCell><Link index={-1} style={{ textDecoration: 'none' }} to={`/clients/member-details/${item._id}/1`} target="_black">{item.Fullname}</Link></CTableDataCell>
                                             <CTableDataCell>{item.ContactNumber}</CTableDataCell>
                                             <CTableDataCell> <label style={{ cursor: 'pointer' }} onClick={() => { setinvId(item.invoiceId), setCliId(item._id), handleInvoice(item.invoiceId, item._id) }}>{item.invoiceNum}</label> </CTableDataCell>
                                             <CTableDataCell>{item.AttendanceID}</CTableDataCell>
                                             <CTableDataCell>{item.serviceName}</CTableDataCell>
-                                            <CTableDataCell>{moment(item.startDate).format("MM-DD-YYYY")}</CTableDataCell>
-                                            <CTableDataCell>{moment(item.endDate).format("MM-DD-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.startDate).format("DD-MM-YYYY")}</CTableDataCell>
+                                            <CTableDataCell>{moment(item.endDate).format("DD-MM-YYYY")}</CTableDataCell>
                                             <CTableDataCell>{item.fitnessGoal}</CTableDataCell>
-                                            <CTableDataCell><CButton>View</CButton></CTableDataCell>
+                                            <CTableDataCell><Link index={-1} style={{ textDecoration: 'none' }} to={`/clients/member-details/${item._id}/5`} target="_black"><BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px' }} /></Link></CTableDataCell>
                                             <CTableDataCell><CButton onClick={() => { setCalls(true), setCallUpdateID(item._id) }}>View</CButton></CTableDataCell>
-                                            <CTableDataCell className='text-center'>{item.plan ? <><CButton className='mt-1' color='success' onClick={() => updateRec(item._id, false)} >Active</CButton></> : <CButton className='mt-1' color='danger' onClick={() => updateRec(item._id, true)}>Inactive</CButton>}</CTableDataCell>
-                                            <CTableDataCell className='text-center'><a href={`tel:${item.CountryCode}${item.ContactNumber}`}><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`}><BsWhatsapp style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`}> <MdMail style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
-                                            <CTableDataCell className='text-center'><MdEdit id={item._id} style={{ fontSize: '35px', cursor: 'pointer', markerStart: '10px' }} onClick={() => handleEnquiry(item._id)} size='20px' /> <MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deleteEnquiry(item._id)} size='20px' /></CTableDataCell>
+                                            <CTableDataCell className='text-center'>{item.status === 'active' ? <><CButton className='mt-1' color='success' onClick={() => updateRec(item._id, 'inactive')} >Active</CButton></> : <CButton className='mt-1' color='danger' onClick={() => updateRec(item._id, 'active')}>Inactive</CButton>}</CTableDataCell>
+                                            <CTableDataCell className='text-center'><a href={`tel:${item.CountryCode}${item.ContactNumber}`} target='_black'><MdCall style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`https://wa.me/${item.ContactNumber}`} target='_black'><BsWhatsapp style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a><a href={`mailto: ${item.Emailaddress}`} target='_black'> <MdMail style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => { setCallReport(true), handleCallReport(item._id) }} size='20px' /></a> <BsPlusCircle id={item._id} style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => handleFollowup(item._id)} /></CTableDataCell>
+                                            <CTableDataCell className='text-center'><Link index={-1} style={{ textDecoration: 'none' }} to={`/clients/member-details/${item._id}/1`} target="_black"><MdEdit id={item._id} style={{ fontSize: '35px', cursor: 'pointer', markerStart: '10px' }} size='20px' /></Link> <MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} onClick={() => deleteEnquiry(item._id)} size='20px' /></CTableDataCell>
                                         </CTableRow>
 
                                     )
@@ -1379,6 +1497,35 @@ const LeftClients = () => {
                             </CTableBody>
                         </CTable>
                     </CCardBody>
+                    <CPagination aria-label="Page navigation example" align="center" className='mt-2'>
+                        <CPaginationItem aria-label="Previous" disabled={paging != 0 ? false : true} onClick={() => paging > 0 && setPaging(paging - 1)}>
+                            <span aria-hidden="true">&laquo;</span>
+                        </CPaginationItem>
+                        <CPaginationItem active onClick={() => setPaging(0)}>{paging + 1}</CPaginationItem>
+                        {result1.filter((list) =>
+                            list.username === username && list.plan === false
+                            && list.Fullname.toLowerCase().includes(Search1.toLowerCase()) &&
+                            list.AttendanceID.toLowerCase().includes(Search5.toLowerCase()) && list.serviceName.toLowerCase().includes(Search6.toLowerCase()) && list.fitnessGoal.toLowerCase().includes(Search7.toLowerCase())
+                        ).length > (paging + 1) * 10 && <CPaginationItem onClick={() => setPaging(paging + 1)} >{paging + 2}</CPaginationItem>}
+
+                        {result1.filter((list) =>
+                            list.username === username && list.plan === false
+                            && list.Fullname.toLowerCase().includes(Search1.toLowerCase()) &&
+                            list.AttendanceID.toLowerCase().includes(Search5.toLowerCase()) && list.serviceName.toLowerCase().includes(Search6.toLowerCase()) && list.fitnessGoal.toLowerCase().includes(Search7.toLowerCase())
+                        ).length > (paging + 2) * 10 && <CPaginationItem onClick={() => setPaging(paging + 2)}>{paging + 3}</CPaginationItem>}
+                        {result1.filter((list) =>
+                            list.username === username && list.plan === false
+                            && list.Fullname.toLowerCase().includes(Search1.toLowerCase()) &&
+                            list.AttendanceID.toLowerCase().includes(Search5.toLowerCase()) && list.serviceName.toLowerCase().includes(Search6.toLowerCase()) && list.fitnessGoal.toLowerCase().includes(Search7.toLowerCase())
+                        ).length > (paging + 1) * 10 ?
+                            <CPaginationItem aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                            : <CPaginationItem disabled aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                        }
+                    </CPagination>
                 </CCard>
             </CCol >
         </CRow >

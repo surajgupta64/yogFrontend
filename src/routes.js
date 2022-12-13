@@ -209,7 +209,7 @@ const routes = [
   { path: '/clients/client-management/left-clients', name: 'Left Clients', element: LeftClients },
   { path: '/clients/service-call', name: 'Service Calls', element: ServiceCall },
   { path: '/clients/all-service', name: 'All Service', element: AllService },
-  { path: '/clients/member-details', name: 'Member Details', element: MemberDetails },
+  { path: '/clients/member-details/:id/:i', name: 'Member Details', element: MemberDetails },
 
 
   //Marketing

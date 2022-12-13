@@ -17,6 +17,8 @@ import {
     CModalFooter,
     CModalHeader,
     CModalTitle,
+    CPagination,
+    CPaginationItem,
     CRow,
     CTable,
     CTableBody,
@@ -29,7 +31,8 @@ import axios from 'axios';
 import { MdCall, MdDelete, MdEdit, MdMail } from 'react-icons/md';
 import { BsPlusCircle, BsWhatsapp } from 'react-icons/bs';
 import moment from 'moment';
-const url = 'https://yog-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const FollowupCallReport = () => {
     const [visible, setVisible] = useState(false)
@@ -53,7 +56,10 @@ const FollowupCallReport = () => {
     const [email, setEmail] = useState("");
     const [ServiceName1, setServiceName1] = useState("");
     const [CallStatus1, setCallStatus1] = useState("");
+    const [enquiryStage, setEnquiryStage] = useState('')
     const [FollowupDate, setFollowupDate] = useState("");
+    const [appointmentDate, setappointmentDate] = useState("");
+    const [appointmentTime, setappointmentTime] = useState("");
     const [TimeFollowp, setTimeFollowp] = useState("");
     const [Discussion, setDiscussion] = useState("");
     const [Counseller, setCounseller] = useState("");
@@ -65,8 +71,24 @@ const FollowupCallReport = () => {
     const centerCode = user.user.centerCode;
     const [result, setResult] = useState([]);
     const [result1, setResult1] = useState([]);
+    const [paging, setPaging] = useState(0);
+
+    const [pros, setPros] = useState([])
     useEffect(() => {
         getEnquiry()
+        getStaff()
+        axios.get(`${url}/prospect/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                console.warn(res.data.filter((list) => list.status === "prospect"))
+                setPros(res.data.filter((list) => list.status === "prospect"))
+            })
+            .catch((error) => {
+                console.error(error)
+            })
         axios.get(`${url}/subservice/all`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -80,33 +102,142 @@ const FollowupCallReport = () => {
                 console.error(error)
             })
     }, []);
+    const [staff, setStaff] = useState([])
+    function getStaff() {
+        axios.get(`${url2}/employeeForm/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                setStaff(res.data)
+                console.log(res.data);
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
     const saveProspect = () => {
-        var currentdate = new Date();
-        var date = currentdate.getDay() + "-" + currentdate.getMonth()
-            + "-" + currentdate.getFullYear();
-        var time =
-            + currentdate.getHours() + ":"
-            + currentdate.getMinutes();
-        let data = {
-            EnquiryID: followForm, CallDate: date, Time: time,
-            Name: Name, Contact: Contact, Email: email, ServiceName: ServiceName1, CallStatus: CallStatus1, FollowupDate: FollowupDate, TimeFollowp: TimeFollowp, Counseller: Counseller, Discussion: Discussion,
-        }
+        if (enquiryStage === 'Appointment') {
+            const data1 = { appointmentDate, appointmentTime, appointmentfor: 'Appointment', Counseller: Counseller }
 
-        fetch(`${url}/prospect/create`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        }).then((resp) => {
-            resp.json().then(() => {
-                alert("successfully submitted")
-                setVisible(false)
+            fetch(`${url}/enquiryForm/update/${followForm}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data1)
+            }).then((resp) => {
+                resp.json().then(() => {
+                    alert("successfully submitted")
+                    setVisible(false)
+                })
             })
-        })
+
+        } else if (enquiryStage === 'Trial Session') {
+            const data1 = { appointmentDate, appointmentTime, appointmentfor: 'Trial Session', Counseller: Counseller }
+
+            fetch(`${url}/enquiryForm/update/${followForm}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data1)
+            }).then((resp) => {
+                resp.json().then(() => {
+                    alert("successfully submitted")
+                    setVisible(false)
+                })
+            })
+        } else if (enquiryStage === 'Join') {
+            handleAdmission(followForm)
+            setVisible(false)
+        } else if (enquiryStage === 'Prospect') {
+            var currentdate = new Date();
+            var date = currentdate.getDay() + "-" + currentdate.getMonth()
+                + "-" + currentdate.getFullYear();
+            var time =
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes();
+            let data = {
+                username: username,
+                EnquiryID: followForm, CallDate: date, Time: time,
+                Name: Name, Contact: Contact, Email: email, ServiceName: ServiceName1, AppointmentDate: appointmentDate, AppointmentTime: appointmentTime, enquiryStage: enquiryStage, CallStatus: CallStatus1, FollowupDate: FollowupDate, TimeFollowp: TimeFollowp, Counseller: Counseller, Discussion: Discussion,
+                status: 'prospect'
+            }
+            if (pros.filter((list) => list.EnquiryID === followForm).length > 0) {
+                const found = pros.filter((list) => list.EnquiryID === followForm).map((element, index) => {
+                    return index === 0 && element._id;
+                });
+                fetch(`${url}/prospect/update/${found[0]}`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then((resp) => {
+                    resp.json().then(() => {
+                        setVisible(false)
+                    })
+                })
+
+                const data1 = { Counseller }
+
+                fetch(`${url}/enquiryForm/update/${followForm}`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data1)
+                }).then((resp) => {
+                    resp.json().then(() => {
+                        alert("successfully submitted")
+                        setVisible(false)
+                    })
+                })
+            } else {
+                fetch(`${url}/prospect/create`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then((resp) => {
+                    resp.json().then(() => {
+                        setVisible(false)
+                    })
+                })
+
+                const data1 = { Counseller }
+
+                fetch(`${url}/enquiryForm/update/${followForm}`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data1)
+                }).then((resp) => {
+                    resp.json().then(() => {
+                        alert("successfully submitted")
+                        setVisible(false)
+                    })
+                })
+            }
+
+        }
 
     }
 
@@ -149,7 +280,7 @@ const FollowupCallReport = () => {
         })
             .then((res) => {
                 console.log(res.data)
-                setResult1(res.data)
+                setResult1(res.data.filter((list) => list.username === username).reverse())
             })
             .catch((error) => {
                 console.error(error)
@@ -201,19 +332,21 @@ const FollowupCallReport = () => {
     }
 
     function deleteProspect(id) {
-        fetch(`${url}/prospect/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }).then((result) => {
-            result.json().then((resp) => {
-                console.warn(resp)
-                getEnquiry()
+        if (confirm('Do you want to delete this')) {
+            fetch(`${url}/prospect/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then((resp) => {
+                    console.warn(resp)
+                    getEnquiry()
+                })
             })
-        })
+        }
     }
 
 
@@ -401,22 +534,27 @@ const FollowupCallReport = () => {
                                                 {result.map((item, index) => (
                                                     item.username === username && (
                                                         item.status === true && (
-                                                            <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                            <option key={index} value={item.id}>{item.selected_service}</option>
                                                         )
                                                     )
                                                 ))}
                                             </CFormSelect>
                                         </CCol>
-                                        <CCol lg={6} md={6} sm={12}>
-                                            <CFormInput
+                                        <CCol lg={4} md={6} sm={12}>
+
+                                            <CFormSelect
                                                 className="mb-1"
-                                                type="text"
+                                                aria-label="Select Assign Staff"
                                                 value={Counseller}
                                                 onChange={(e) => setCounseller(e.target.value)}
-                                                id="exampleFormControlInput1"
-                                                label="Counseller"
-                                                placeholder="Enter Counseller Name"
-                                            />
+                                                label='Counseller'
+                                            >
+                                                <option>Select Counseller</option>
+                                                {staff.filter((list) => list.username === username && list.selected === 'Select').map((item, index) => (
+                                                    item.username === username && (
+                                                        <option key={index}>{item.FullName}</option>
+                                                    )
+                                                ))}</CFormSelect>
                                         </CCol>
 
                                         <CCol lg={4} md={6} sm={12}>
@@ -517,7 +655,7 @@ const FollowupCallReport = () => {
                                                 placeholder="Enter Number"
                                             />
                                         </CCol>
-                                        <CCol lg={6} md={6} sm={12}>
+                                        <CCol lg={4} md={6} sm={12}>
                                             <CFormSelect
                                                 className="mb-1"
                                                 aria-label="Select Service Name"
@@ -530,24 +668,95 @@ const FollowupCallReport = () => {
                                                 {result.map((item, index) => (
                                                     item.username === username && (
                                                         item.status === true && (
-                                                            <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                            <option key={index} value={item.id}>{item.selected_service}</option>
                                                         )
                                                     )
                                                 ))}
                                             </CFormSelect>
                                         </CCol>
-                                        <CCol lg={6} md={6} sm={12}>
-                                            <CFormInput
+                                        <CCol lg={4} md={6} sm={12}>
+
+                                            <CFormSelect
                                                 className="mb-1"
-                                                type="text"
+                                                aria-label="Select Assign Staff"
                                                 value={Counseller}
                                                 onChange={(e) => setCounseller(e.target.value)}
-                                                id="exampleFormControlInput1"
-                                                label="Counseller"
-                                                placeholder="Enter Counseller Name"
+                                                label='Counseller'
+                                            >
+                                                <option>Select Counseller</option>
+                                                {staff.filter((list) => list.username === username && list.selected === 'Select').map((item, index) => (
+                                                    item.username === username && (
+                                                        <option key={index}>{item.FullName}</option>
+                                                    )
+                                                ))}</CFormSelect>
+                                        </CCol>
+                                        <CCol lg={4} md={6} sm={12}>
+                                            <CFormSelect
+                                                className="mb-1"
+                                                aria-label="Select Call Status"
+                                                value={enquiryStage}
+                                                onChange={(e) => setEnquiryStage(e.target.value)}
+                                                label="Prospect Stage"
+                                                options={[
+                                                    "Select",
+                                                    { label: "Appointment", value: "Appointment" },
+                                                    { label: "Trial Session", value: "Trial Session" },
+                                                    { label: "Join", value: "Join" },
+                                                    { label: 'Prospect', value: 'Prospect' }
+                                                ]}
                                             />
                                         </CCol>
 
+                                        {(enquiryStage === 'Appointment') &&
+                                            <>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="Appointment Date"
+                                                        type="date"
+                                                        value={appointmentDate}
+                                                        onChange={(e) => setappointmentDate(e.target.value)}
+                                                        id="exampleFormControlInput1"
+                                                    />
+                                                </CCol>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="Appointment Time"
+                                                        type="time"
+                                                        id="exampleFormControlInput1"
+                                                        value={appointmentTime}
+                                                        onChange={(e) => setappointmentTime(e.target.value)}
+
+                                                    />
+                                                </CCol>
+                                            </>
+                                        }
+                                        {(enquiryStage === 'Trial Session') &&
+                                            <>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="Trial Date"
+                                                        type="date"
+                                                        value={appointmentDate}
+                                                        onChange={(e) => setappointmentDate(e.target.value)}
+                                                        id="exampleFormControlInput1"
+                                                    />
+                                                </CCol>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="Trial Time"
+                                                        type="time"
+                                                        id="exampleFormControlInput1"
+                                                        value={appointmentTime}
+                                                        onChange={(e) => setappointmentTime(e.target.value)}
+
+                                                    />
+                                                </CCol>
+                                            </>
+                                        }
                                         <CCol lg={4} md={6} sm={12}>
                                             <CFormSelect
                                                 className="mb-1"
@@ -563,37 +772,44 @@ const FollowupCallReport = () => {
                                                 ]}
                                             />
                                         </CCol>
-                                        <CCol lg={4} md={6} sm={12}>
-                                            <CFormInput
-                                                className="mb-1"
-                                                label="FollowUp Date"
-                                                type="date"
-                                                value={FollowupDate}
-                                                onChange={(e) => setFollowupDate(e.target.value)}
-                                                id="exampleFormControlInput1"
-                                            />
-                                        </CCol>
-                                        <CCol lg={4} md={6} sm={12}>
-                                            <CFormInput
-                                                className="mb-1"
-                                                label="FollowUp Time"
-                                                type="time"
-                                                id="exampleFormControlInput1"
-                                                value={TimeFollowp}
-                                                onChange={(e) => setTimeFollowp(e.target.value)}
+                                        {(enquiryStage === 'Prospect') &&
+                                            <>
 
-                                            />
-                                        </CCol>
-                                        <CCol>
-                                            <CFormTextarea
-                                                id="exampleFormControlTextarea1"
-                                                label="Discussion"
-                                                value={Discussion}
-                                                onChange={(e) => setDiscussion(e.target.value)}
-                                                rows="2"
-                                                text="Must be 8-20 words long."
-                                            ></CFormTextarea>
-                                        </CCol>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="FollowUp Date"
+                                                        type="date"
+                                                        value={FollowupDate}
+                                                        onChange={(e) => setFollowupDate(e.target.value)}
+                                                        id="exampleFormControlInput1"
+                                                    />
+                                                </CCol>
+                                                <CCol lg={4} md={6} sm={12}>
+                                                    <CFormInput
+                                                        className="mb-1"
+                                                        label="FollowUp Time"
+                                                        type="time"
+                                                        id="exampleFormControlInput1"
+                                                        value={TimeFollowp}
+                                                        onChange={(e) => setTimeFollowp(e.target.value)}
+
+                                                    />
+                                                </CCol>
+                                            </>
+                                        }
+                                        {enquiryStage === 'Prospect' &&
+                                            <CCol lg={12} md={12} sm={12}>
+                                                <CFormTextarea
+                                                    id="exampleFormControlTextarea1"
+                                                    label="Discussion"
+                                                    value={Discussion}
+                                                    onChange={(e) => setDiscussion(e.target.value)}
+                                                    rows="2"
+                                                    text="Must be 8-20 words long."
+                                                ></CFormTextarea>
+                                            </CCol>
+                                        }
                                     </CRow>
                                 </CForm>
                             </CModalBody>
@@ -601,7 +817,7 @@ const FollowupCallReport = () => {
                                 <CButton color="secondary" onClick={() => setVisible(false)}>
                                     Close
                                 </CButton>
-                                <CButton type='submit' color="primary" onClick={() => saveProspect()}>Save Prospect</CButton>
+                                <CButton type='submit' color="primary" onClick={() => saveProspect()}>{enquiryStage === 'Join' ? 'Open Admission Form' : 'Save Prospect'}</CButton>
                             </CModalFooter>
                         </CModal>
 
@@ -660,22 +876,27 @@ const FollowupCallReport = () => {
                                                 {result.map((item, index) => (
                                                     item.username === username && (
                                                         item.status === true && (
-                                                            <option key={index} value={item.id}>{item.selected_service} {item.sub_Service_Name}</option>
+                                                            <option key={index} value={item.id}>{item.selected_service}</option>
                                                         )
                                                     )
                                                 ))}
                                             </CFormSelect>
                                         </CCol>
-                                        <CCol lg={6} md={6} sm={12}>
-                                            <CFormInput
+                                        <CCol lg={4} md={6} sm={12}>
+
+                                            <CFormSelect
                                                 className="mb-1"
-                                                type="text"
+                                                aria-label="Select Assign Staff"
                                                 value={Counseller}
                                                 onChange={(e) => setCounseller(e.target.value)}
-                                                id="exampleFormControlInput1"
-                                                label="Counseller"
-                                                placeholder="Enter Counseller Name"
-                                            />
+                                                label='Counseller'
+                                            >
+                                                <option>Select Counseller</option>
+                                                {staff.filter((list) => list.username === username && list.selected === 'Select').map((item, index) => (
+                                                    item.username === username && (
+                                                        <option key={index}>{item.FullName}</option>
+                                                    )
+                                                ))}</CFormSelect>
                                         </CCol>
 
                                         <CCol lg={4} md={6} sm={12}>
@@ -883,20 +1104,20 @@ const FollowupCallReport = () => {
                                         />
                                     </CTableDataCell>
                                 </CTableRow>
-                                {result1.filter((list) =>
+                                {result1.slice(paging * 10, paging * 10 + 10).filter((list) =>
                                     list.username === username && list.status === 'CallReport'
                                 ).map((item, index) => (
                                     <CTableRow key={index}>
-                                        <CTableDataCell>{index + 1}</CTableDataCell>
-                                        <CTableDataCell>{centerCode}ENQ{index + 10}</CTableDataCell>
-                                        <CTableDataCell className='text-center'>{moment(item.CallDate).format("LL")}</CTableDataCell>
+                                        <CTableDataCell>{index + 1 + (paging * 10)}</CTableDataCell>
+                                        <CTableDataCell>{centerCode}Q{index + 10 + (paging * 10)}</CTableDataCell>
+                                        <CTableDataCell className='text-center'>{moment(item.CallDate).format("DD-MM-YYYY")}</CTableDataCell>
                                         <CTableDataCell>{moment(item.Time, "HH:mm").format("hh:mm A")}</CTableDataCell>
                                         <CTableDataCell>{item.Name}</CTableDataCell>
                                         <CTableDataCell>{item.Email}</CTableDataCell>
                                         <CTableDataCell>{item.Contact}</CTableDataCell>
                                         <CTableDataCell>{item.ServiceName}</CTableDataCell>
                                         <CTableDataCell>{item.CallStatus}</CTableDataCell>
-                                        <CTableDataCell>{item.FollowupDate && moment(item.FollowupDate).format("LL")}</CTableDataCell>
+                                        <CTableDataCell>{item.FollowupDate && moment(item.FollowupDate).format("DD-MM-YYYY")}</CTableDataCell>
                                         <CTableDataCell>{item.TimeFollowp && moment(item.TimeFollowp, "HH:mm").format("hh:mm A")}</CTableDataCell>
                                         <CTableDataCell>{item.Discussion}</CTableDataCell>
                                         <CTableDataCell>{item.Counseller}</CTableDataCell>
@@ -905,6 +1126,29 @@ const FollowupCallReport = () => {
                             </CTableBody>
                         </CTable>
                     </CCardBody>
+                    <CPagination aria-label="Page navigation example" align="center" className='mt-2'>
+                        <CPaginationItem aria-label="Previous" disabled={paging != 0 ? false : true} onClick={() => paging > 0 && setPaging(paging - 1)}>
+                            <span aria-hidden="true">&laquo;</span>
+                        </CPaginationItem>
+                        <CPaginationItem active onClick={() => setPaging(0)}>{paging + 1}</CPaginationItem>
+                        {result1.filter((list) =>
+                            list.username === username && list.status === 'CallReport'
+                        ).length > (paging + 1) * 10 && <CPaginationItem onClick={() => setPaging(paging + 1)} >{paging + 2}</CPaginationItem>}
+
+                        {result1.filter((list) =>
+                            list.username === username && list.status === 'CallReport'
+                        ).length > (paging + 2) * 10 && <CPaginationItem onClick={() => setPaging(paging + 2)}>{paging + 3}</CPaginationItem>}
+                        {result1.filter((list) =>
+                            list.username === username && list.status === 'CallReport'
+                        ).length > (paging + 1) * 10 ?
+                            <CPaginationItem aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                            : <CPaginationItem disabled aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                        }
+                    </CPagination>
                 </CCard>
             </CCol>
         </CRow>

@@ -35,7 +35,7 @@ const Login = () => {
       setError(null)
       let item = { email, password }
 
-      let result = await fetch("https://yoga-power-node-api.herokuapp.com/login", {
+      let result = await fetch("https://yog-seven.vercel.app/login", {
         method: "POST",
         headers: {
           'Accept': 'application/json',
@@ -59,7 +59,7 @@ const Login = () => {
       setError('Please Enter Details')
     }
   }
-
+  /*  */
   return (
     <div className=" min-vh-100 d-flex flex-row align-items-center" style={{ backgroundColor: '#0B5345' }}>
       <CContainer className="justify-content-center" >

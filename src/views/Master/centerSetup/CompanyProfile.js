@@ -18,7 +18,8 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CountryList } from "src/components/CountryList";
-const url = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const CompanyProfile = () => {
     const [profileId, setProfileId] = useState("")

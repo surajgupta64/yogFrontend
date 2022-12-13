@@ -9,6 +9,8 @@ import {
     CFormInput,
     CFormSwitch,
     CFormTextarea,
+    CPagination,
+    CPaginationItem,
     CRow,
     CTable,
     CTableBody,
@@ -20,7 +22,8 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
-const url = 'https://yog-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const EmailSmsMaster = () => {
     const [action1, setAction1] = useState(false)
@@ -33,6 +36,7 @@ const EmailSmsMaster = () => {
     const token = user.token;
     const username = user.user.username;
     const [result1, setResult1] = useState([]);
+    const [paging, setPaging] = useState(0)
     const headers = {
         'Authorization': `Bearer ${token}`,
         'My-Custom-Header': 'foobar'
@@ -49,7 +53,7 @@ const EmailSmsMaster = () => {
         })
             .then((res) => {
                 console.log(res.data)
-                setResult1(res.data)
+                setResult1(res.data.reverse())
             })
             .catch((error) => {
                 console.error(error)
@@ -208,10 +212,10 @@ const EmailSmsMaster = () => {
                         </CTableRow>
                     </CTableHead>
                     <CTableBody>
-                        {result1.map((item, index) => (
+                        {result1.slice(paging * 10, paging * 10 + 10).map((item, index) => (
                             item.username === username && (
                                 <CTableRow key={index}>
-                                    <CTableDataCell>{index + 1}</CTableDataCell>
+                                    <CTableDataCell>{index + 1 + (paging * 10)}</CTableDataCell>
                                     <CTableDataCell>{item.templateName}</CTableDataCell>
                                     <CTableDataCell className="text-center">{item.content}</CTableDataCell>
                                     <CTableDataCell><CFormSwitch size="xl" style={{ cursor: 'pointer' }} id={item._id} value={item.Status} checked={item.Status} onChange={() => updateStatus(item._id, !item.Status)} /></CTableDataCell>
@@ -222,6 +226,23 @@ const EmailSmsMaster = () => {
                     </CTableBody>
                 </CTable>
             </CCardBody>
+            <CPagination aria-label="Page navigation example" align="center" className='mt-2'>
+                <CPaginationItem aria-label="Previous" disabled={paging != 0 ? false : true} onClick={() => paging > 0 && setPaging(paging - 1)}>
+                    <span aria-hidden="true">&laquo;</span>
+                </CPaginationItem>
+                <CPaginationItem active onClick={() => setPaging(0)}>{paging + 1}</CPaginationItem>
+                {result1.filter((list) => list.username === username).length > (paging + 1) * 10 && <CPaginationItem onClick={() => setPaging(paging + 1)} >{paging + 2}</CPaginationItem>}
+
+                {result1.filter((list) => list.username === username).length > (paging + 2) * 10 && <CPaginationItem onClick={() => setPaging(paging + 2)}>{paging + 3}</CPaginationItem>}
+                {result1.filter((list) => list.username === username).length > (paging + 1) * 10 ?
+                    <CPaginationItem aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                        <span aria-hidden="true">&raquo;</span>
+                    </CPaginationItem>
+                    : <CPaginationItem disabled aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                        <span aria-hidden="true">&raquo;</span>
+                    </CPaginationItem>
+                }
+            </CPagination>
         </CCard>
     );
 };

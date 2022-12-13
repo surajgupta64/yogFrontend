@@ -19,7 +19,8 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
-const url = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const PayrollMaster = () => {
     const [action1, setAction1] = useState(false)
@@ -52,19 +53,22 @@ const PayrollMaster = () => {
             })
     }
     function deleteSubService(id) {
-        fetch(`${url}/subservice/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }).then((result) => {
-            result.json().then((resp) => {
-                console.warn(resp)
-                getSubService()
+
+        if (confirm('Do you want to delete this')) {
+            fetch(`${url}/subservice/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then((resp) => {
+                    console.warn(resp)
+                    getSubService()
+                })
             })
-        })
+        }
     }
 
 

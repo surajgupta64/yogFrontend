@@ -75,18 +75,21 @@ const StockReport = () => {
 
 
     function deleteCall(id) {
-        fetch(`${url}/stockListing/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }).then((result) => {
-            result.json().then(() => {
-                getImpCall()
+
+        if (confirm('Do you want to delete this')) {
+            fetch(`${url}/stockListing/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then(() => {
+                    getImpCall()
+                })
             })
-        })
+        }
     }
 
     const handleUpdate = (id) => {

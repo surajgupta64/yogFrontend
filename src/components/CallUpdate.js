@@ -4,7 +4,8 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { BsWhatsapp } from 'react-icons/bs';
 import { MdCall, MdMail } from 'react-icons/md';
-const url = 'https://yog-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const CallUpdate = ({ add, clickfun, ids }) => {
     const [result1, setResult1] = useState([])

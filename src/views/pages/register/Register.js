@@ -15,6 +15,8 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilAddressBook, cilCode, cilLockLocked, cilUser } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const Register = () => {
   const [username, setUsername] = useState("")
@@ -27,7 +29,7 @@ const Register = () => {
   function saveData() {
     let data = { username, email, password, dashboardAccess }
     // console.warn(data);
-    fetch("https://yoga-power-appv0.herokuapp.com/signup/create", {
+    fetch(`${url}/signup/create`, {
       method: "POST",
       headers: {
         'Accept': 'application/json',

@@ -5,6 +5,8 @@ import {
     CCol,
     CForm,
     CFormInput,
+    CPagination,
+    CPaginationItem,
     CRow,
     CTable,
     CTableBody,
@@ -51,6 +53,7 @@ const ClothesProduct = () => {
     const token = user.token;
     const username = user.user.username;
     const centerCode = user.user.centerCode;
+    const [paging, setPaging] = useState(0);
     useEffect(() => {
         getImpCall()
     }, [])
@@ -62,7 +65,7 @@ const ClothesProduct = () => {
             }
         })
             .then((res) => {
-                setResult1(res.data)
+                setResult1(res.data.reverse())
                 console.log(res.data);
             })
             .catch((error) => {
@@ -115,18 +118,21 @@ const ClothesProduct = () => {
     }
 
     function deleteCall(id) {
-        fetch(`${url}/foodProduct/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }).then((result) => {
-            result.json().then(() => {
-                getImpCall()
+
+        if (confirm('Do you want to delete this')) {
+            fetch(`${url}/foodProduct/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then(() => {
+                    getImpCall()
+                })
             })
-        })
+        }
     }
 
     const handleUpdate = (id) => {
@@ -395,12 +401,12 @@ const ClothesProduct = () => {
                             />
                         </CTableDataCell>
                     </CTableRow>
-                    {result1.filter((list) =>
+                    {result1.slice(paging * 10, paging * 10 + 10).filter((list) =>
                         list.username === username && list.productName.includes(search2) && list.brandName.includes(search3) && list.category.includes(search4) && list.color.includes(search5) &&
                         list.productPrice.toString().includes(search6.toString())
                     ).map((item, index) => (
                         <CTableRow key={index}>
-                            <CTableDataCell>{index + 1}</CTableDataCell>
+                            <CTableDataCell>{index + 1 + (paging * 10)}</CTableDataCell>
                             <CTableDataCell>{item.productCode}</CTableDataCell>
                             <CTableDataCell>{item.productName}</CTableDataCell>
                             <CTableDataCell>{item.brandName}</CTableDataCell>
@@ -417,6 +423,33 @@ const ClothesProduct = () => {
                     ))}
                 </CTableBody>
             </CTable>
+
+            <CPagination aria-label="Page navigation example" align="center" className='mt-2'>
+                <CPaginationItem aria-label="Previous" disabled={paging != 0 ? false : true} onClick={() => paging > 0 && setPaging(paging - 1)}>
+                    <span aria-hidden="true">&laquo;</span>
+                </CPaginationItem>
+                <CPaginationItem active onClick={() => setPaging(0)}>{paging + 1}</CPaginationItem>
+                {result1.filter((list) =>
+                    list.username === username && list.productName.includes(search2) && list.brandName.includes(search3) && list.category.includes(search4) && list.color.includes(search5) &&
+                    list.productPrice.toString().includes(search6.toString())
+                ).length > (paging + 1) * 10 && <CPaginationItem onClick={() => setPaging(paging + 1)} >{paging + 2}</CPaginationItem>}
+
+                {result1.filter((list) =>
+                    list.username === username && list.productName.includes(search2) && list.brandName.includes(search3) && list.category.includes(search4) && list.color.includes(search5) &&
+                    list.productPrice.toString().includes(search6.toString())
+                ).length > (paging + 2) * 10 && <CPaginationItem onClick={() => setPaging(paging + 2)}>{paging + 3}</CPaginationItem>}
+                {result1.filter((list) =>
+                    list.username === username && list.productName.includes(search2) && list.brandName.includes(search3) && list.category.includes(search4) && list.color.includes(search5) &&
+                    list.productPrice.toString().includes(search6.toString())
+                ).length > (paging + 1) * 10 ?
+                    <CPaginationItem aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                        <span aria-hidden="true">&raquo;</span>
+                    </CPaginationItem>
+                    : <CPaginationItem disabled aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                        <span aria-hidden="true">&raquo;</span>
+                    </CPaginationItem>
+                }
+            </CPagination>
         </CRow>
 
     );

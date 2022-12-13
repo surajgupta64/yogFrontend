@@ -26,7 +26,8 @@ import DataTable from 'src/components/DataTable'
 import { MdDelete, MdEdit } from 'react-icons/md';
 import moment from 'moment';
 import axios from 'axios';
-const url = 'https://yog-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 
 const StaffCheckIns = () => {

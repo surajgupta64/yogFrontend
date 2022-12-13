@@ -20,7 +20,8 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
-const url = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const BatchMaster = () => {
     const [action, setAction] = useState(false)
@@ -102,18 +103,21 @@ const BatchMaster = () => {
     }
 
     function deleteBatch(id) {
-        fetch(`${url}/Batch/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }).then((result) => {
-            result.json().then((resp) => {
-                getBatch()
+
+        if (confirm('Do you want to delete this')) {
+            fetch(`${url}/Batch/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then((resp) => {
+                    getBatch()
+                })
             })
-        })
+        }
     }
 
 

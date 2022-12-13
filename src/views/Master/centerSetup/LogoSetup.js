@@ -17,7 +17,8 @@ import { useNavigate } from "react-router-dom";
 import ProfileIcon from 'src/assets/images/avatars/profile_icon.png'
 import { storage } from "src/firebase";
 import { v4 } from "uuid";
-const url = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const LogoSetup = () => {
     const [image, setImage] = useState()

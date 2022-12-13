@@ -1,7 +1,8 @@
 import { CButton, CCol, CForm, CFormInput, CFormSelect, CFormTextarea, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-const url = 'https://yog-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const CallReport = ({ add, clickfun, id }) => {
 

@@ -44,10 +44,14 @@ import { storage } from "src/firebase";
 import logo from 'src/assets/images/avatars/icon.png'
 import { v4 } from "uuid";
 import { useReactToPrint } from 'react-to-print'
-const url = 'https://yog-api.herokuapp.com'
-const url2 = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
-const AdmissionForm1 = ({ add, clickfun, ids }) => {
+const AdmissionForm1 = ({ add, clickfun, ids, deleteId }) => {
+
+    const adId = JSON.parse(localStorage.getItem('adId'))
+    console.log(adId);
+    console.log(ids);
     const componentRef = useRef()
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
@@ -137,7 +141,35 @@ const AdmissionForm1 = ({ add, clickfun, ids }) => {
         getPackage()
         getImage()
         console.log(ids);
-    }, []);
+        getDetails(ids)
+    }, [])
+
+    /*  EnquiryId: centerCode + 'Q' + result1.length + 1,
+                Fullname, Emailaddress, CountryCode, ContactNumber, Gander, DateofBirth, address, Area, city, Profession,
+                StaffName, CenterName, CallStatus, Message,
+                person_Name, Relation, CountryCode2: CountryCode2, ContactNumber2: ContactNumber2,
+                EnquiryDate, ServiceName, ServiceVariation, Customertype, enquirytype, appointmentDate, appointmentTime, appointmentfor: appointmentfor, Counseller: counseller, trialDate: trialDate, 
+             */
+    function getDetails(data) {
+        setFullname(data.Fullname)
+        setEmail(data.Emailaddress)
+        setCountryCode(data.CountryCode)
+        setContactNumber(data.ContactNumber)
+        setWhatsappNumber(data.ContactNumber)
+        setGender(data.Gander)
+        setDateofBirth(data.DateofBirth)
+        setAddress(data.address)
+        setArea(data.Area)
+        setCity(data.city)
+        setName(data.person_Name)
+        setRelationship(data.Relation)
+        setCountryCode1(data.CountryCode2)
+        setContactNumber1(data.ContactNumber2)
+        setserviceName(data.ServiceName)
+        setserviceVariation(data.ServiceVariation)
+        setAssignStaff(data.StaffName)
+
+    }
 
     function getPackage() {
         axios.get(`${url}/Package/all`, {
@@ -261,6 +293,20 @@ const AdmissionForm1 = ({ add, clickfun, ids }) => {
             .catch((error) => {
                 console.error(error)
             })
+        if (deleteId != undefined && deleteId != null) {
+            fetch(`${url}/enquiryForm/delete/${deleteId}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then((resp) => {
+                    console.warn(resp)
+                })
+            })
+        }
     }
 
     const [visi1, setVisi1] = useState('')
@@ -531,7 +577,7 @@ const AdmissionForm1 = ({ add, clickfun, ids }) => {
                                                         aria-label="Select Currency"
                                                         value={Gender}
                                                         onChange={(e) => setGender(e.target.value)}
-                                                        label="Gander"
+                                                        label="Gender"
                                                         options={[
                                                             "Select Gender",
                                                             { label: "Male", value: "Male" },
@@ -712,9 +758,9 @@ const AdmissionForm1 = ({ add, clickfun, ids }) => {
                                                         <option>Select Service</option>
                                                         {result1.map((item, index) => (
                                                             item.username === username && (
-                                                                item.status === true && (
-                                                                    <option key={index}>{item.selected_service}</option>
-                                                                )
+
+                                                                <option key={index}>{item.selected_service}</option>
+
                                                             )
                                                         ))}</CFormSelect>
                                                 </CCol>
@@ -729,9 +775,9 @@ const AdmissionForm1 = ({ add, clickfun, ids }) => {
                                                         <option>Select Service</option>
                                                         {result1.filter((list) => list.selected_service === serviceName).map((item, index) => (
                                                             item.username === username && (
-                                                                item.status === true && (
-                                                                    <option key={index}>{item.sub_Service_Name}</option>
-                                                                )
+
+                                                                <option key={index}>{item.sub_Service_Name}</option>
+
                                                             )
                                                         ))}</CFormSelect>
                                                 </CCol>
@@ -1076,7 +1122,7 @@ const AdmissionForm1 = ({ add, clickfun, ids }) => {
                             </CTabPane>
                         </CTabContent>
 
-                        <CModal size="xl" alignment="center" scrollable visible={visi} onClose={() => setVisi(false)}>
+                        <CModal size="xl" alignment="center" scrollable visible={visi} onClose={() => { setVisi(false) }}>
                             <CModalHeader>
                                 <CModalTitle>Invoice</CModalTitle>
                             </CModalHeader>
@@ -1423,7 +1469,7 @@ const AdmissionForm1 = ({ add, clickfun, ids }) => {
 
                             </CModalBody>
                             <CModalFooter>
-                                <CButton color="secondary" onClick={() => setVisi(false)}>
+                                <CButton color="secondary" onClick={() => { setVisi(false) }}>
                                     Close
                                 </CButton>
                                 <CButton color="primary" onClick={() => saveInvoice()}>Submit</CButton>

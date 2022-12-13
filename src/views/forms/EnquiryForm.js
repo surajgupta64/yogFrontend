@@ -16,8 +16,8 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CountryList } from "src/components/CountryList";
-const url = 'https://yog-api.herokuapp.com'
-const url2 = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 
 const EnquiryForm = () => {
@@ -44,6 +44,7 @@ const EnquiryForm = () => {
     const [ServiceVariation, setServiceVariation] = useState("");
     const [Customertype, setCustomertype] = useState("");
     const [enquirytype, setEnquirytype] = useState("");
+    const [trialDate, setTrialDate] = useState("");
     const [appointmentDate, setappointmentDate] = useState("");
     const [appointmentTime, setappointmentTime] = useState("");
     const [appointmentfor, setappointmentfor] = useState("");
@@ -54,6 +55,7 @@ const EnquiryForm = () => {
     console.log(user);
     const token = user.token;
     const username = user.user.username;
+    const centerCode = user.user.centerCode;
     const [result, setResult] = useState([]);
     const [serviceArr, setServiceArr] = useState([]);
     const [result1, setResult1] = useState([]);
@@ -120,18 +122,22 @@ const EnquiryForm = () => {
     }
 
     const saveEnquiry = () => {
+        let enqId = centerCode + 'Q' + (result1.length + 1);
+
         let data = {
             username: username,
+            EnquiryId: enqId,
             Fullname, Emailaddress, CountryCode, ContactNumber, Gander, DateofBirth, address, Area, city, Profession,
             StaffName, CenterName, CallStatus, Message,
             person_Name, Relation, CountryCode2: CountryCode2, ContactNumber2: ContactNumber2,
-            EnquiryDate, ServiceName, ServiceVariation, Customertype, enquirytype, appointmentDate, appointmentTime, appointmentfor: appointmentfor, Counseller: counseller, status: "all_enquiry",
+            EnquiryDate, ServiceName, ServiceVariation, Customertype, enquirytype, appointmentDate, appointmentTime, appointmentfor: appointmentfor, Counseller: counseller, trialDate: trialDate, status: "all_enquiry",
         }
 
         const headers = {
             'Authorization': `Bearer ${token}`,
             'My-Custom-Header': 'foobar'
         }
+
         axios.post(`${url}/enquiryForm/create`, data, { headers })
             .then((resp) => {
                 console.log(resp)
@@ -156,10 +162,12 @@ const EnquiryForm = () => {
                 setappointmentTime('')
                 setappointmentfor('')
                 setCounseller('')
+                setAddress('')
             })
             .catch((error) =>
                 console.error(error)
             )
+
     }
 
     return (
@@ -307,14 +315,14 @@ const EnquiryForm = () => {
                                         label="Staff Name"
                                         value={StaffName}
                                         onChange={(e) => setStaffName(e.target.value)}
-                                        options={[
-                                            "Select Staff Name",
-                                            { label: "prabha", value: "prabha" },
-                                            { label: "sejal", value: "sejal" },
-                                            { label: "sonali", value: "sonali" },
-                                            { label: "None", value: "None" },
-                                        ]}
-                                    />
+                                    >
+                                        <option>Select Staff Name</option>
+                                        {staff.filter((list) => list.username === username && list.selected === 'Select').map((item, index) => (
+                                            item.username === username && (
+                                                <option key={index}>{item.FullName}</option>
+                                            )
+                                        ))}
+                                    </CFormSelect>
                                 </CCol>
                                 <CCol lg={6} md={6} sm={12}>
                                     <CFormSelect
@@ -534,6 +542,18 @@ const EnquiryForm = () => {
                                         ]}
                                     />
                                 </CCol>
+                                {appointmentfor === 'Trial Session' && (
+                                    <CCol lg={6} md={6} sm={12}>
+                                        <CFormInput
+                                            className="mb-1"
+                                            label='Trial Date'
+                                            type="date"
+                                            value={trialDate}
+                                            onChange={(e) => setTrialDate(e.target.value)}
+                                            id="exampleFormControlInput1"
+                                        />
+                                    </CCol>
+                                )}
                                 <CCol lg={6} md={6} sm={12}>
 
                                     <CFormSelect

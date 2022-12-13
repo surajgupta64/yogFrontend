@@ -14,9 +14,45 @@ import {
     CRow,
 } from "@coreui/react";
 import ProfileIcon from 'src/assets/images/avatars/profile_icon.png'
-import React from "react";
+import React, { useEffect } from "react";
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
-const PersonalDetails = () => {
+const PersonalDetails = ({ id }) => {
+
+    useEffect(() => {
+        getDetails(id)
+    }, [])
+    function getDetails(id) {
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'My-Custom-Header': 'foobar'
+        };
+        axios.get(`${url}/memberForm/${id}`, { headers },
+        )
+            .then((resp) => {
+                setFullname(resp.Fullname)
+                setEmail(resp.Emailaddress)
+                setCountryCode(resp.CountryCode)
+                setContactNumber(resp.ContactNumber)
+                setWhatsappNumber(resp.ContactNumber)
+                setGender(resp.Gander)
+                setDateofBirth(resp.DateofBirth)
+                setAddress(resp.address)
+                setArea(resp.Area)
+                setCity(resp.city)
+                setName(resp.person_Name)
+                setRelationship(resp.Relation)
+                setCountryCode1(resp.CountryCode2)
+                setContactNumber1(resp.ContactNumber2)
+                setserviceName(resp.ServiceName)
+                setserviceVariation(resp.ServiceVariation)
+                setAssignStaff(resp.StaffName)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+    }
 
     return (
         <CForm>
@@ -25,15 +61,18 @@ const PersonalDetails = () => {
                     <CCardTitle>Personal Details</CCardTitle>
                     <CRow>
                         <CCol xs={4} className='mt-2 mb-1' >
-                            <CImage className="mb-1" style={{ borderRadius: "50px" }} width={'200px'} src={ProfileIcon} />
+                            <CImage ref={imgRef} className="mb-1" style={{ borderRadius: "50px" }} width={'160px'} src={ProfileIcon} />
                         </CCol>
-                        <CCol xs={8} className='mt-5'>
-                            <CRow>
-                                <CButton className="me-3 ms-3" style={{ margin: '5px', width: '200px' }}>Upload Image</CButton>
-                            </CRow>
-                            <CRow>
-                                <CButton className="me-3 ms-3" style={{ margin: '5px', width: '200px' }}>Capture Image</CButton>
-                            </CRow>
+                        <CCol xs={7} className='mt-3'>
+
+                            <CFormInput
+                                className="mb-1 mr-3"
+                                type="file"
+                                onChange={handleImage}
+                                accept="image/*"
+                            />
+                            <CButton onClick={UploadImage}>Upload Image</CButton>
+
                         </CCol>
                         <CCol xs={6}>
                             <CFormInput
@@ -41,6 +80,8 @@ const PersonalDetails = () => {
                                 type="text"
                                 id="exampleFormControlInput1"
                                 label="Full name"
+                                value={Fullname}
+                                onChange={(e) => setFullname(e.target.value)}
                                 placeholder="Enter Name"
                             />
                         </CCol>
@@ -50,6 +91,8 @@ const PersonalDetails = () => {
                                 type="email"
                                 id="exampleFormControlInput1"
                                 label="Email address"
+                                value={Email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 placeholder="name@example.com"
                                 text="Must be 8-20 characters long."
                                 aria-describedby="exampleFormControlInputHelpInline"
@@ -62,13 +105,12 @@ const PersonalDetails = () => {
                                 className="mb-1"
                                 aria-label="Select Currency"
                                 label="Country Code"
-                                options={[
-                                    "Select Country Code",
-                                    { label: "One", value: "1" },
-                                    { label: "Two", value: "2" },
-                                    { label: "Three", value: "3" },
-                                ]}
-                            />
+                                value={CountryCode}
+                                onChange={(e) => setCountryCode(e.target.value)}
+                            >{CountryList.map((item, index) => (
+                                <option key={index} value={item.dial_code}>{item.name} {item.dial_code}</option>
+                            ))}
+                            </CFormSelect>
                         </CCol>
                         <CCol>
                             <CFormInput
@@ -76,6 +118,8 @@ const PersonalDetails = () => {
                                 type="number"
                                 id="exampleFormControlInput1"
                                 label="Contact Number"
+                                value={ContactNumber}
+                                onChange={(e) => setContactNumber(e.target.value)}
                                 placeholder="Enter Number"
                             />
                         </CCol>
@@ -86,6 +130,8 @@ const PersonalDetails = () => {
                                 className="mb-1"
                                 type="number"
                                 id="exampleFormControlInput1"
+                                value={WhatsappNumber}
+                                onChange={(e) => setWhatsappNumber(e.target.value)}
                                 label="Whatsapp Number"
                                 placeholder="Enter Number"
                             />
@@ -95,6 +141,8 @@ const PersonalDetails = () => {
                                 className="mb-1"
                                 type="date"
                                 id="exampleFormControlInput1"
+                                value={DateofBirth}
+                                onChange={(e) => setDateofBirth(e.target.value)}
                                 label="Date of Birth"
                                 placeholder="Enter Date"
                             />
@@ -102,14 +150,28 @@ const PersonalDetails = () => {
                     </CRow>
                     <CRow>
                         <CCol>
+                            <CFormInput
+                                className="mb-1"
+                                type="date"
+                                id="exampleFormControlInput1"
+                                value={Anniversarydate}
+                                onChange={(e) => setAnniversarydate(e.target.value)}
+                                label='Anniversary Date'
+                                placeholder="Enter Anniversary Date"
+                            />
+                        </CCol>
+                        <CCol>
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Currency"
-                                label="Gander"
+                                value={Gender}
+                                onChange={(e) => setGender(e.target.value)}
+                                label="Gender"
                                 options={[
                                     "Select Gender",
-                                    { label: "Male", value: "1" },
-                                    { label: "Female", value: "2" },
+                                    { label: "Male", value: "Male" },
+                                    { label: "Female", value: "Female" },
+                                    { label: "Other", value: "Other" },
                                 ]}
                             />
                         </CCol>
@@ -119,6 +181,8 @@ const PersonalDetails = () => {
                         <CFormTextarea
                             id="exampleFormControlTextarea1"
                             label="Address"
+                            value={Address}
+                            onChange={(e) => setAddress(e.target.value)}
                             rows="2"
                             text="Must be 8-20 words long."
                         ></CFormTextarea>
@@ -129,6 +193,8 @@ const PersonalDetails = () => {
                                 className="mb-1"
                                 type="text"
                                 id="exampleFormControlInput1"
+                                value={Area}
+                                onChange={(e) => setArea(e.target.value)}
                                 label="Area"
                                 placeholder="Enter Locality"
                             />
@@ -137,7 +203,8 @@ const PersonalDetails = () => {
                             <CFormInput
                                 className="mb-1"
                                 type="text"
-                                id="exampleFormControlInput1"
+                                value={city}
+                                onChange={(e) => setCity(e.target.value)}
                                 label="City"
                                 placeholder="Enter City"
                             />
@@ -148,7 +215,8 @@ const PersonalDetails = () => {
                             <CFormInput
                                 className="mb-1"
                                 type="number"
-                                id="exampleFormControlInput1"
+                                value={pincode}
+                                onChange={(e) => setPincode(e.target.value)}
                                 label="Pin Code"
                                 placeholder="Enter Pin Code"
                             />
@@ -157,7 +225,8 @@ const PersonalDetails = () => {
                             <CFormInput
                                 className="mb-1"
                                 type="text"
-                                id="exampleFormControlInput1"
+                                value={state}
+                                onChange={(e) => setState(e.target.value)}
                                 label="State"
                                 placeholder="Enter State"
                             />
@@ -169,7 +238,8 @@ const PersonalDetails = () => {
                             <CFormInput
                                 className="mb-1"
                                 type="url"
-                                id="exampleFormControlInput1"
+                                value={FacebookID}
+                                onChange={(e) => setFacebookID(e.target.value)}
                                 label="Facebook Id"
                                 placeholder="Enter Facebook id"
                             />
@@ -178,11 +248,19 @@ const PersonalDetails = () => {
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Blood Group"
+                                value={BloodGroup}
+                                onChange={(e) => setBloodGroup(e.target.value)}
                                 label="Blood Group"
                                 options={[
                                     "Select Blood Group",
-                                    { label: "A", value: "1" },
-                                    { label: "B", value: "2" },
+                                    { label: "A+", value: "A+" },
+                                    { label: "A-", value: "A-" },
+                                    { label: "B+", value: "B+" },
+                                    { label: "B-", value: "B-" },
+                                    { label: "O+", value: "O+" },
+                                    { label: "O-", value: "O-" },
+                                    { label: "AB+", value: "AB+" },
+                                    { label: "AB-", value: "AB-" },
                                 ]}
                             />
                         </CCol>
@@ -190,13 +268,19 @@ const PersonalDetails = () => {
                     <CCardTitle>Communication Preference Settings</CCardTitle>
                     <CRow>
                         <CCol xs={4}>
-                            <CFormSwitch size="xl" label="SMS" defaultChecked />
+                            <CFormSwitch size="xl" label="SMS"
+                                checked={sms}
+                                onChange={() => setsms(!sms)} />
                         </CCol>
                         <CCol xs={4}>
-                            <CFormSwitch size="xl" label="Mail" defaultChecked />
+                            <CFormSwitch size="xl" label="Mail"
+                                checked={mail}
+                                onChange={() => setmail(!mail)} />
                         </CCol>
                         <CCol xs={4}>
-                            <CFormSwitch size="xl" label="Push Notification" defaultChecked />
+                            <CFormSwitch size="xl" label="Push Notification"
+                                checked={pushnotification}
+                                onChange={() => setpushnotification(!pushnotification)} />
                         </CCol>
                     </CRow>
                 </CCol>
@@ -209,6 +293,8 @@ const PersonalDetails = () => {
                                 className="mb-1"
                                 type="text"
                                 id="exampleFormControlInput1"
+                                value={Name}
+                                onChange={(e) => setName(e.target.value)}
                                 label="Name"
                                 placeholder="Enter Name"
                             />
@@ -217,6 +303,8 @@ const PersonalDetails = () => {
                             <CFormInput
                                 className="mb-1"
                                 type="text"
+                                value={Relationship}
+                                onChange={(e) => setRelationship(e.target.value)}
                                 id="exampleFormControlInput1"
                                 label="Relationship"
                                 placeholder="Enter Relationship"
@@ -227,21 +315,20 @@ const PersonalDetails = () => {
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Working Days"
+                                value={CountryCode1}
+                                onChange={(e) => setCountryCode1(e.target.value)}
                                 label="Country Code"
-                                options={[
-                                    "Select Country Code",
-                                    { label: "+91", value: "1" },
-                                    { label: "Two", value: "2" },
-                                    { label: "Three", value: "3" },
-                                ]}
-                            />
+                            >{CountryList.map((item, index) => (
+                                <option key={index} value={item.dial_code}>{item.name} {item.dial_code}</option>
+                            ))}</CFormSelect>
                         </CCol>
                         <CCol xs={6}>
-
                             <CFormInput
                                 className="mb-1"
                                 type="number"
                                 id="exampleFormControlInput1"
+                                value={ContactNumber1}
+                                onChange={(e) => setContactNumber1(e.target.value)}
                                 label="Contact Number"
                                 placeholder="Enter Number"
                             />
@@ -253,41 +340,70 @@ const PersonalDetails = () => {
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Service Name"
+                                value={serviceName}
+                                onChange={(e) => setserviceName(e.target.value)}
                                 label="Service Name"
-                                options={[
-                                    "Select Service Name",
-                                    { label: "Yoga", value: "1" },
-                                    { label: "PT", value: "2" },
-                                    { label: "TTC", value: "3" },
-                                ]}
-                            />
+                            >
+                                <option>Select Service</option>
+                                {result1.map((item, index) => (
+                                    item.username === username && (
+                                        item.status === true && (
+                                            <option key={index}>{item.selected_service}</option>
+                                        )
+                                    )
+                                ))}</CFormSelect>
+                        </CCol>
+                        <CCol xs={6}>
+                            <CFormSelect
+                                className="mb-1"
+                                aria-label="Select Service Name"
+                                value={serviceVaration}
+                                onChange={(e) => setserviceVariation(e.target.value)}
+                                label="Service Variation"
+                            >
+                                <option>Select Service</option>
+                                {result1.filter((list) => list.selected_service === serviceName).map((item, index) => (
+                                    item.username === username && (
+                                        item.status === true && (
+                                            <option key={index}>{item.sub_Service_Name}</option>
+                                        )
+                                    )
+                                ))}</CFormSelect>
                         </CCol>
 
                         <CCol xs={6}>
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Customer type"
+                                value={Customertype}
+                                onChange={(e) => setCustomertype(e.target.value)}
                                 label="Customer type"
                                 options={[
                                     "Select Customer type",
-                                    { label: "Yoga", value: "1" },
-                                    { label: "PT", value: "2" },
-                                    { label: "TTC", value: "3" },
+                                    { label: "Self", value: "Self" },
+                                    { label: "Group", value: "Group" },
+                                    { label: "Couple", value: "Couple" },
+                                    { label: "Youth", value: "Touth" },
+                                    { label: "Kids", value: "Kids" },
                                 ]}
                             />
                         </CCol>
                         <CCol xs={6}>
+
                             <CFormSelect
                                 className="mb-1"
-                                aria-label="Select Enquiry Type"
+                                aria-label="Select Assign Staff"
+                                value={EnquiryType}
+                                onChange={(e) => setEnquiryType(e.target.value)}
                                 label="Enquiry Type"
-                                options={[
-                                    "Select Enquiry Type",
-                                    { label: "Yoga", value: "1" },
-                                    { label: "PT", value: "2" },
-                                    { label: "TTC", value: "3" },
-                                ]}
-                            />
+
+                            >
+                                <option>Select Enquiry Type</option>
+                                {leadArr.filter((list) => list.username === username).map((item, index) => (
+                                    item.username === username && (
+                                        <option key={index}>{item.LeadSource}</option>
+                                    )
+                                ))}</CFormSelect>
                         </CCol>
                     </CRow>
 
@@ -297,26 +413,29 @@ const PersonalDetails = () => {
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Assign Staff"
+                                value={AssignStaff}
+                                onChange={(e) => setAssignStaff(e.target.value)}
                                 label="Assign Staff"
-                                options={[
-                                    "Select Assign Staff",
-                                    { label: "Yoga", value: "1" },
-                                    { label: "PT", value: "2" },
-                                    { label: "TTC", value: "3" },
-                                ]}
-                            />
+                            >
+                                <option>Select Assign Staff</option>
+                                {staff.filter((list) => list.username === username && list.Department === 'Sales').map((item, index) => (
+                                    <option key={index}>{item.FullName}</option>
+                                ))}
+                            </CFormSelect>
                         </CCol>
-
                         <CCol xs={6}>
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Member Manager"
+                                value={MemberManager}
+                                onChange={(e) => setMemberManager(e.target.value)}
                                 label="Member Manager"
                                 options={[
                                     "Select Member Manager",
-                                    { label: "Yoga", value: "1" },
-                                    { label: "PT", value: "2" },
-                                    { label: "TTC", value: "3" },
+                                    { label: "prabha", value: "prabha" },
+                                    { label: "sejal", value: "sejal" },
+                                    { label: "sonali", value: "sonali" },
+                                    { label: "None", value: "None" },
                                 ]}
                             />
                         </CCol>
@@ -324,25 +443,26 @@ const PersonalDetails = () => {
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select Batch"
+                                value={Batch}
+                                onChange={(e) => setBatch(e.target.value)}
                                 label="Batch"
-                                options={[
-                                    "Select Batch",
-                                    { label: "Yoga", value: "1" },
-                                    { label: "PT", value: "2" },
-                                    { label: "TTC", value: "3" },
-                                ]}
-                            />
+                            ><option>Select Batch</option>
+                                {result.map((item, index) => (
+                                    item.username === username && (
+                                        <option key={index} value={item.batch_timing}>{item.batch_timing} {item.Batch_Duration}</option>
+                                    )
+                                ))}</CFormSelect>
                         </CCol>
                         <CCol xs={6}>
                             <CFormSelect
                                 className="mb-1"
                                 aria-label="Select General Trainer"
+                                value={GeneralTrainer}
+                                onChange={(e) => setGeneralTrainer(e.target.value)}
                                 label="General Trainer"
                                 options={[
                                     "Select General Trainer",
-                                    { label: "Yoga", value: "1" },
-                                    { label: "PT", value: "2" },
-                                    { label: "TTC", value: "3" },
+                                    { label: "None", value: "None" },
                                 ]}
                             />
                         </CCol>
@@ -350,28 +470,37 @@ const PersonalDetails = () => {
                     <CRow>
                         <CCardTitle>IDs</CCardTitle>
                         <CCol xs={6}>
-                            <CFormInput
+                            <CFormSelect
                                 className="mb-1"
                                 type="text"
                                 id="exampleFormControlInput1"
+                                value={AttendanceID}
+                                onChange={(e) => setAttendanceID(e.target.value)}
                                 label="Attendance ID"
-                                placeholder="Enter Attendance ID"
-                            />
+                            >
+                                <option>Select Attendance ID</option>
+                                <option>CLIENT{mem.length + 1}</option>
+                            </CFormSelect>
+                        </CCol>
+                        <CCol xs={6}>
+                            <CFormSelect
+                                className="mb-1"
+                                type="text"
+                                id="exampleFormControlInput1"
+                                value={CenterID}
+                                onChange={(e) => setCenterID(e.target.value)}
+                                label="Center ID">
+                                <option>Select Center ID</option>
+                                <option>{username}</option>
+                            </CFormSelect>
                         </CCol>
                         <CCol xs={6}>
                             <CFormInput
                                 className="mb-1"
                                 type="text"
                                 id="exampleFormControlInput1"
-                                label="Center ID"
-                                placeholder="Enter Club ID"
-                            />
-                        </CCol>
-                        <CCol xs={6}>
-                            <CFormInput
-                                className="mb-1"
-                                type="text"
-                                id="exampleFormControlInput1"
+                                value={LockerKeyNo}
+                                onChange={(e) => setLockerKeyNo(e.target.value)}
                                 label="Locker Key No"
                                 placeholder="Enter Locker Key No"
                             />
@@ -381,6 +510,8 @@ const PersonalDetails = () => {
                                 className="mb-1"
                                 type="text"
                                 id="exampleFormControlInput1"
+                                value={PAN}
+                                onChange={(e) => setPAN(e.target.value)}
                                 label="PAN"
                                 placeholder="Enter PAN"
                             />
@@ -394,38 +525,49 @@ const PersonalDetails = () => {
                 <CCol>
                     <CListGroup>
                         <CListGroupItem>
-                            <CFormCheck label="Asthma/COPD" />
+                            <CFormCheck label="Back Pain"
+                                checked={BackPain}
+                                onChange={() => setBackPain(!BackPain)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="Back Pain" />
+                            <CFormCheck label="Bone Fracture"
+                                checked={BoneFracture}
+                                onChange={() => setBoneFracture(!BoneFracture)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="Bone Fracture" />
+                            <CFormCheck label="Carpal Tunnel"
+                                checked={CarpalTunnel}
+                                onChange={() => setCarpalTunnel(!CarpalTunnel)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="Carpal Tunnel" />
-                        </CListGroupItem>
-                        <CListGroupItem>
-                            <CFormCheck label="Diabetes" />
+                            <CFormCheck label="Diabetes"
+                                checked={Diabetes}
+                                onChange={() => setDiabetes(!Diabetes)}
+                            />
                         </CListGroupItem>
                     </CListGroup>
                 </CCol>
                 <CCol>
                     <CListGroup>
                         <CListGroupItem>
-                            <CFormCheck label="Digestive Disorder" />
+                            <CFormCheck label="Pregnancy"
+                                checked={HeartDiseaseCondition}
+                                onChange={() => setHeartDiseaseCondition(!HeartDiseaseCondition)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="Shoulder Pain" />
+                            <CFormCheck label="Shoulder Pain"
+                                checked={Epilepsy}
+                                onChange={() => setEpilepsy(!Epilepsy)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="Foot Pain" />
+                            <CFormCheck label="Foot Pain"
+                                checked={FootPain}
+                                onChange={() => setFootPain(!FootPain)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="Knee Replacement" />
-                        </CListGroupItem>
-                        <CListGroupItem>
-                            <CFormCheck label="High Cholestrol" />
+                            <CFormCheck label="Knee Replacement"
+                                checked={Glaucoma}
+                                onChange={() => setGlaucoma(!Glaucoma)} />
                         </CListGroupItem>
                     </CListGroup>
                 </CCol>
@@ -433,24 +575,42 @@ const PersonalDetails = () => {
                 <CCol>
                     <CListGroup>
                         <CListGroupItem>
-                            <CFormCheck label="Joint Pain" />
+                            <CFormCheck label="Joint Pain"
+                                checked={AsthmaCOPD}
+                                onChange={() => setAsthmaCOPD(!AsthmaCOPD)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="Pregnancy" />
+                            <CFormCheck label="Surgery"
+                                checked={HerniaDiastasisRecti}
+                                onChange={() => setHerniaDiastasisRecti(!HerniaDiastasisRecti)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="Surgery" />
+                            <CFormCheck label="High Blood Pressure"
+                                checked={HighBloodPressure}
+                                onChange={() => setHighBloodPressure(!HighBloodPressure)} />
                         </CListGroupItem>
                         <CListGroupItem>
-                            <CFormCheck label="High Blood Pressure" />
-                        </CListGroupItem>
-                        <CListGroupItem>
-                            <CFormCheck label="Other" />
+                            <CFormCheck label="Other"
+                                checked={Other}
+                                onChange={() => setOther(!Other)} />
                         </CListGroupItem>
                     </CListGroup>
                 </CCol>
+                {Other && (
+                    <CCol lg={12}>
+                        <CFormInput
+                            className="mb-1"
+                            type="text"
+                            id="exampleFormControlInput1"
+                            value={OtherText}
+                            onChange={(e) => setOtherText(e.target.value)}
+                            label="Other Reason"
+                            placeholder="Enter Other Reason"
+                        />
+                    </CCol>
+                )}
             </CRow>
-            <CButton className="mt-2">Save</CButton>
+            <CButton className='mt-2' onClick={() => saveMember()}>Next</CButton>
         </CForm>
     );
 };

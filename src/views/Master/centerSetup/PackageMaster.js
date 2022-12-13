@@ -23,7 +23,8 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { MdDelete } from "react-icons/md";
-const url = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 
 const PackageMaster = () => {
@@ -75,19 +76,22 @@ const PackageMaster = () => {
     }
 
     function deletePackage(id) {
-        fetch(`${url}/Package/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }).then((result) => {
-            result.json().then((resp) => {
-                console.warn(resp)
-                getPackage()
+
+        if (confirm('Do you want to delete this')) {
+            fetch(`${url}/Package/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }).then((result) => {
+                result.json().then((resp) => {
+                    console.warn(resp)
+                    getPackage()
+                })
             })
-        })
+        }
     }
 
     const savePackage = () => {

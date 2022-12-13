@@ -44,8 +44,8 @@ import { storage } from "src/firebase";
 import logo from 'src/assets/images/avatars/icon.png'
 import { v4 } from "uuid";
 import { useReactToPrint } from 'react-to-print'
-const url = 'https://yog-api.herokuapp.com'
-const url2 = 'https://yoga-power-node-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const MemberForm = () => {
 

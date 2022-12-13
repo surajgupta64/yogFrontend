@@ -5,7 +5,8 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { MdDelete, MdEdit } from 'react-icons/md'
 import moment from 'moment/moment'
-const url = 'https://yog-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const StaffCheckin = () => {
     const [attendance, setAttendance] = useState(0);
@@ -152,7 +153,6 @@ const StaffCheckin = () => {
                         </CCard>
                     </CCol>
                     {attendance >= 1 &&
-
                         <CCol lg={4}>
                             <CCard>
                                 <CCardBody>
@@ -216,7 +216,7 @@ const StaffCheckin = () => {
                         </CTableRow>
                     </CTableHead>
                     <CTableBody>
-                        {result1.filter((list) => list.username === username).map((item, index) => (
+                        {result1.reverse().filter((list) => list.username === username).map((item, index) => (
                             <CTableRow key={index}>
                                 <CTableDataCell>{index + 1}</CTableDataCell>
                                 <CTableDataCell>{item.ClientName}</CTableDataCell>

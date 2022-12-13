@@ -10,6 +10,8 @@ import {
     CFormSelect,
     CInputGroup,
     CInputGroupText,
+    CPagination,
+    CPaginationItem,
     CRow,
     CTable,
     CTableBody,
@@ -24,7 +26,8 @@ import { MdDelete } from 'react-icons/md'
 import axios from 'axios'
 import moment from 'moment'
 import ViewInvoice from 'src/components/ViewInvoice'
-const url = 'https://yog-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const PaidInvoice = () => {
 
@@ -47,6 +50,7 @@ const PaidInvoice = () => {
     const username = user.user.username;
     const centerCode = user.user.centerCode;
     const [result1, setResult1] = useState([]);
+    const [paging, setPaging] = useState(0);
     const headers = {
         'Authorization': `Bearer ${token}`,
         'My-Custom-Header': 'foobar'
@@ -63,7 +67,7 @@ const PaidInvoice = () => {
         })
             .then((res) => {
                 console.log(res.data)
-                setResult1(res.data)
+                setResult1(res.data.reverse())
             })
             .catch((error) => {
                 console.error(error)
@@ -296,14 +300,14 @@ const PaidInvoice = () => {
                                         />
                                     </CTableDataCell>
                                 </CTableRow>
-                                {result1.filter((list) => list.username === username && list.MemberName.toLowerCase().includes(Search1.toLowerCase()) && list.InvoiceNo.toLowerCase().includes(Search2.toLowerCase())
+                                {result1.slice(paging * 10, paging * 10 + 10).filter((list) => list.username === username && list.MemberName.toLowerCase().includes(Search1.toLowerCase()) && list.InvoiceNo.toLowerCase().includes(Search2.toLowerCase())
                                     && list.ServiceName.toLowerCase().includes(Search3.toLowerCase()) && list.counseller.toLowerCase().includes(Search6.toLowerCase()) && list.totalAmount.toString().includes(Search7.toString())
                                     && list.tax.toString().includes(Search8.toString()) && list.paidAmount.toString().includes(Search9.toString()) && list.pendingAmount.toString().includes(Search10.toString())
                                     && list.paidAmount > 0)
                                     .map((item, index) => (
                                         <CTableRow key={index}>
-                                            <CTableHeaderCell>{index + 1}</CTableHeaderCell>
-                                            <CTableDataCell>{centerCode}MEM{index + 1}</CTableDataCell>
+                                            <CTableHeaderCell>{index + 1 + (paging * 10)}</CTableHeaderCell>
+                                            <CTableDataCell>{centerCode}MEM{index + 1 + (paging * 10)}</CTableDataCell>
                                             <CTableDataCell>{item.MemberName}</CTableDataCell>
                                             <CTableDataCell><label style={{ cursor: 'pointer' }} onClick={() => { setinvId(item._id), setCliId(item.MemberId), handleInvoice(item._id, item.MemberId) }}>{item.InvoiceNo}</label> </CTableDataCell>
                                             <CTableDataCell>{item.ServiceName}</CTableDataCell>
@@ -320,6 +324,35 @@ const PaidInvoice = () => {
                             </CTableBody>
                         </CTable>
                     </CCardBody>
+                    <CPagination aria-label="Page navigation example" align="center" className='mt-2'>
+                        <CPaginationItem aria-label="Previous" disabled={paging != 0 ? false : true} onClick={() => paging > 0 && setPaging(paging - 1)}>
+                            <span aria-hidden="true">&laquo;</span>
+                        </CPaginationItem>
+                        <CPaginationItem active onClick={() => setPaging(0)}>{paging + 1}</CPaginationItem>
+                        {result1.filter((list) => list.username === username && list.MemberName.toLowerCase().includes(Search1.toLowerCase()) && list.InvoiceNo.toLowerCase().includes(Search2.toLowerCase())
+                            && list.ServiceName.toLowerCase().includes(Search3.toLowerCase()) && list.counseller.toLowerCase().includes(Search6.toLowerCase()) && list.totalAmount.toString().includes(Search7.toString())
+                            && list.tax.toString().includes(Search8.toString()) && list.paidAmount.toString().includes(Search9.toString()) && list.pendingAmount.toString().includes(Search10.toString())
+                            && list.paidAmount > 0)
+                            .length > (paging + 1) * 10 && <CPaginationItem onClick={() => setPaging(paging + 1)} >{paging + 2}</CPaginationItem>}
+
+                        {result1.filter((list) => list.username === username && list.MemberName.toLowerCase().includes(Search1.toLowerCase()) && list.InvoiceNo.toLowerCase().includes(Search2.toLowerCase())
+                            && list.ServiceName.toLowerCase().includes(Search3.toLowerCase()) && list.counseller.toLowerCase().includes(Search6.toLowerCase()) && list.totalAmount.toString().includes(Search7.toString())
+                            && list.tax.toString().includes(Search8.toString()) && list.paidAmount.toString().includes(Search9.toString()) && list.pendingAmount.toString().includes(Search10.toString())
+                            && list.paidAmount > 0)
+                            .length > (paging + 2) * 10 && <CPaginationItem onClick={() => setPaging(paging + 2)}>{paging + 3}</CPaginationItem>}
+                        {result1.filter((list) => list.username === username && list.MemberName.toLowerCase().includes(Search1.toLowerCase()) && list.InvoiceNo.toLowerCase().includes(Search2.toLowerCase())
+                            && list.ServiceName.toLowerCase().includes(Search3.toLowerCase()) && list.counseller.toLowerCase().includes(Search6.toLowerCase()) && list.totalAmount.toString().includes(Search7.toString())
+                            && list.tax.toString().includes(Search8.toString()) && list.paidAmount.toString().includes(Search9.toString()) && list.pendingAmount.toString().includes(Search10.toString())
+                            && list.paidAmount > 0)
+                            .length > (paging + 1) * 10 ?
+                            <CPaginationItem aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                            : <CPaginationItem disabled aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                        }
+                    </CPagination>
                 </CCard>
             </CCol>
         </CRow>

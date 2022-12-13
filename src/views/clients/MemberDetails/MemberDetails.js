@@ -24,10 +24,27 @@ import {
     CTableRow,
     CTabPane,
 } from '@coreui/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import Appointment from './Appointment'
+import CallUpdate from './CallUpdate'
+import Documents from './Documents'
+import Payment from './Payment'
 import ProfileDetails from './ProfileDetails'
+import Referrals from './Referrals'
+import ServiceProfile from './ServiceProfile'
+import Teams from './Teams'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 const MemberDetails = () => {
-    const [activeKey, setActiveKey] = useState(1)
+    const [activeKey, setActiveKey] = useState(0)
+    const { id, i } = useParams()
+    console.log(id)
+    useEffect(() => {
+        if (id !== null) {
+            setActiveKey(i)
+        }
+    }, [])
 
     return (
         <CRow>
@@ -44,17 +61,16 @@ const MemberDetails = () => {
                                 { id: '6', heading: 'Refers' },
                                 { id: '7', heading: 'Shop' },
                                 { id: '8', heading: 'Calls' },
-                                { id: '10', heading: 'Fitness' },
-                                { id: '11', heading: 'Docs' },
-                                { id: '12', heading: 'T&C' },
-
+                                { id: '9', heading: 'Fitness' },
+                                { id: '10', heading: 'Docs' },
+                                { id: '11', heading: 'T&C' },
                             ].map((item, index) => (
                                 <CNavItem key={index}>
                                     <CNavLink
                                         style={{ color: 'white' }}
                                         href="javascript:void(0);"
-                                        active={activeKey === item.id}
-                                        onClick={() => setActiveKey(item.id)}
+                                        active={activeKey - 1 === index}
+                                        onClick={() => setActiveKey(index + 1)}
                                     >
                                         {item.heading}
                                     </CNavLink>
@@ -65,366 +81,23 @@ const MemberDetails = () => {
                     <CCardBody>
                         <CTabContent>
                             {[
-                                { id: '1', heading: 'Profile', com: <ProfileDetails /> },
-                                { id: '2', heading: 'Services', },
-                                { id: '3', heading: 'Payments' },
+                                { id: '1', heading: 'Profile', com: <ProfileDetails ids={id} deleteId={id} /> },
+                                { id: '2', heading: 'Services', com: <ServiceProfile id={id} /> },
+                                { id: '3', heading: 'Payments', com: <Payment id={id} /> },
                                 { id: '4', heading: 'Attendance' },
-                                { id: '5', heading: 'Appointments' },
-                                { id: '6', heading: 'Refers' },
+                                { id: '5', heading: 'Appointments', com: <Appointment id={id} /> },
+                                { id: '6', heading: 'Refers', com: <Referrals id={id} /> },
                                 { id: '7', heading: 'Shop' },
-                                { id: '8', heading: 'Calls' },
-                                { id: '9', heading: 'Trials' },
-                                { id: '10', heading: 'Fitness' },
-                                { id: '11', heading: 'Docs' },
-                                { id: '12', heading: 'T&C' },
+                                { id: '8', heading: 'Calls', com: <CallUpdate id={id} /> },
+                                { id: '9', heading: 'Fitness' },
+                                { id: '10', heading: 'Docs', com: <Documents id={id} /> },
+                                { id: '11', heading: 'T&C', com: <Teams id={id} /> },
 
                             ].map((item, index) => (
-                                <CTabPane key={index} role="tabpanel" aria-labelledby="home-tab" visible={activeKey === item.id}>
+                                <CTabPane key={index} role="tabpanel" aria-labelledby="home-tab" visible={activeKey - 1 === index}>
                                     {item.com}
                                 </CTabPane>
                             ))}
-                            <CTabPane role="tabpanel" aria-labelledby="home-tab" visible={activeKey === 2}>
-                                <CRow className='mb-3'>
-                                    <CCol xs={2}>
-                                        <CInputGroup>
-                                            <CInputGroupText
-                                                component="label"
-                                                htmlFor="inputGroupSelect01"
-                                            >
-                                                Month
-                                            </CInputGroupText>
-                                            <CFormSelect id="inputGroupSelect01">
-                                                <option>Sep</option>
-                                                <option value="1">One</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
-                                            </CFormSelect>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol xs={2}>
-                                        <CInputGroup>
-                                            <CInputGroupText
-                                                component="label"
-                                                htmlFor="inputGroupSelect01"
-                                            >
-                                                Year
-                                            </CInputGroupText>
-                                            <CFormSelect id="inputGroupSelect01">
-                                                <option>2022</option>
-                                                <option value="1">One</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
-                                            </CFormSelect>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol>
-                                        <CInputGroup className="left">
-                                            <CFormInput
-                                                placeholder="Staff Name"
-                                                aria-label="Recipient's username"
-                                                aria-describedby="button-addon2"
-                                            />
-                                            <CButton type="button" color="primary" id="button-addon2">
-                                                Go
-                                            </CButton>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol>
-                                        <CButtonGroup>
-                                            <CButton color="primary">
-                                                <CIcon icon={cilArrowCircleBottom} />
-                                                Import
-                                            </CButton>
-                                            <CButton color="primary">
-                                                <CIcon icon={cilArrowCircleTop} />
-                                                Export
-                                            </CButton>
-                                        </CButtonGroup>
-                                    </CCol>
-                                </CRow>
-                                <CTable bordered borderColor="primary" responsive>
-                                    <CTableHead style={{ backgroundColor: "darkblue", color: "white" }} >
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="col">S.No</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Counseller</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Target</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">
-                                                Achieved/Collected
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">New Sales</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Renewals</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">
-                                                Balance Collection
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">View</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Achived %</CTableHeaderCell>
-                                        </CTableRow>
-                                    </CTableHead>
-                                    <CTableBody>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">1</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">2</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">3</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                    </CTableBody>
-                                </CTable>
-                            </CTabPane>
-                            <CTabPane role="tabpanel" aria-labelledby="home-tab" visible={activeKey === 3}>
-                                <CRow className='mb-3'>
-                                    <CCol xs={2}>
-                                        <CInputGroup>
-                                            <CInputGroupText
-                                                component="label"
-                                                htmlFor="inputGroupSelect01"
-                                            >
-                                                Month
-                                            </CInputGroupText>
-                                            <CFormSelect id="inputGroupSelect01">
-                                                <option>Sep</option>
-                                                <option value="1">One</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
-                                            </CFormSelect>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol xs={2}>
-                                        <CInputGroup>
-                                            <CInputGroupText
-                                                component="label"
-                                                htmlFor="inputGroupSelect01"
-                                            >
-                                                Year
-                                            </CInputGroupText>
-                                            <CFormSelect id="inputGroupSelect01">
-                                                <option>2022</option>
-                                                <option value="1">One</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
-                                            </CFormSelect>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol>
-                                        <CInputGroup className="left">
-                                            <CFormInput
-                                                placeholder="Staff Name"
-                                                aria-label="Recipient's username"
-                                                aria-describedby="button-addon2"
-                                            />
-                                            <CButton type="button" color="primary" id="button-addon2">
-                                                Go
-                                            </CButton>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol>
-                                        <CButtonGroup>
-                                            <CButton color="primary">
-                                                <CIcon icon={cilArrowCircleBottom} />
-                                                Import
-                                            </CButton>
-                                            <CButton color="primary">
-                                                <CIcon icon={cilArrowCircleTop} />
-                                                Export
-                                            </CButton>
-                                        </CButtonGroup>
-                                    </CCol>
-                                </CRow>
-                                <CTable bordered borderColor="primary" responsive>
-                                    <CTableHead style={{ backgroundColor: "darkblue", color: "white" }} >
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="col">S.No</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Counseller</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Target</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">
-                                                Achieved/Collected
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">New Sales</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Renewals</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">
-                                                Balance Collection
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">View</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Achived %</CTableHeaderCell>
-                                        </CTableRow>
-                                    </CTableHead>
-                                    <CTableBody>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">1</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">2</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">3</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                    </CTableBody>
-                                </CTable>
-                            </CTabPane>
-                            <CTabPane role="tabpanel" aria-labelledby="home-tab" visible={activeKey === 4}>
-                                <CRow className='mb-3'>
-                                    <CCol xs={2}>
-                                        <CInputGroup>
-                                            <CInputGroupText
-                                                component="label"
-                                                htmlFor="inputGroupSelect01"
-                                            >
-                                                Month
-                                            </CInputGroupText>
-                                            <CFormSelect id="inputGroupSelect01">
-                                                <option>Sep</option>
-                                                <option value="1">One</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
-                                            </CFormSelect>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol xs={2}>
-                                        <CInputGroup>
-                                            <CInputGroupText
-                                                component="label"
-                                                htmlFor="inputGroupSelect01"
-                                            >
-                                                Year
-                                            </CInputGroupText>
-                                            <CFormSelect id="inputGroupSelect01">
-                                                <option>2022</option>
-                                                <option value="1">One</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
-                                            </CFormSelect>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol>
-                                        <CInputGroup className="left">
-                                            <CFormInput
-                                                placeholder="Staff Name"
-                                                aria-label="Recipient's username"
-                                                aria-describedby="button-addon2"
-                                            />
-                                            <CButton type="button" color="primary" id="button-addon2">
-                                                Go
-                                            </CButton>
-                                        </CInputGroup>
-                                    </CCol>
-                                    <CCol>
-                                        <CButtonGroup>
-                                            <CButton color="primary">
-                                                <CIcon icon={cilArrowCircleBottom} />
-                                                Import
-                                            </CButton>
-                                            <CButton color="primary">
-                                                <CIcon icon={cilArrowCircleTop} />
-                                                Export
-                                            </CButton>
-                                        </CButtonGroup>
-                                    </CCol>
-                                </CRow>
-                                <CTable bordered borderColor="primary" responsive>
-                                    <CTableHead style={{ backgroundColor: "darkblue", color: "white" }} >
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="col">S.No</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Counseller</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Target</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">
-                                                Achieved/Collected
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">New Sales</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Renewals</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">
-                                                Balance Collection
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">View</CTableHeaderCell>
-                                            <CTableHeaderCell scope="col">Achived %</CTableHeaderCell>
-                                        </CTableRow>
-                                    </CTableHead>
-                                    <CTableBody>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">1</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">2</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                        <CTableRow>
-                                            <CTableHeaderCell scope="row">3</CTableHeaderCell>
-                                            <CTableDataCell>Sejal</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>10000</CTableDataCell>
-                                            <CTableDataCell>5000</CTableDataCell>
-                                            <CTableDataCell>2000</CTableDataCell>
-                                            <CTableDataCell>3000</CTableDataCell>
-                                            <CTableDataCell>View</CTableDataCell>
-                                            <CTableDataCell>100%</CTableDataCell>
-                                        </CTableRow>
-                                    </CTableBody>
-                                </CTable>
-                            </CTabPane>
                         </CTabContent>
                     </CCardBody>
                 </CCard>

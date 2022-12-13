@@ -12,6 +12,8 @@ import {
     CFormSelect,
     CFormSwitch,
     CFormTextarea,
+    CPagination,
+    CPaginationItem,
     CRow,
     CTable,
     CTableBody,
@@ -23,7 +25,8 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
-const url = 'https://yog-api.herokuapp.com'
+const url = 'https://yog-seven.vercel.app'
+const url2 = 'https://yog-seven.vercel.app'
 
 const HRPolicy = () => {
     const [action, setAction] = useState(false)
@@ -34,6 +37,7 @@ const HRPolicy = () => {
     const token = user.token;
     const username = user.user.username;
     const [result1, setResult1] = useState([]);
+    const [paging, setPaging] = useState(0);
     const headers = {
         'Authorization': `Bearer ${token}`,
         'My-Custom-Header': 'foobar'
@@ -50,7 +54,7 @@ const HRPolicy = () => {
         })
             .then((res) => {
                 console.log(res.data)
-                setResult1(res.data)
+                setResult1(res.data.reverse())
             })
             .catch((error) => {
                 console.error(error)
@@ -158,10 +162,10 @@ const HRPolicy = () => {
                             </CTableHead>
                             <CTableBody>
 
-                                {result1.filter((list) =>
+                                {result1.slice(paging * 10, paging * 10 + 10).filter((list) =>
                                     list.username === username).map((item, index) => (
                                         <CTableRow key={index}>
-                                            <CTableDataCell>{index + 1}</CTableDataCell>
+                                            <CTableDataCell>{index + 1 + (paging * 10)}</CTableDataCell>
                                             <CTableDataCell>{item.Title}</CTableDataCell>
                                             <CTableDataCell>{item.Policy}</CTableDataCell>
                                             <CTableDataCell> <MdDelete style={{ cursor: 'pointer', markerStart: '10px' }} size='20px' onClick={() => deleteData(item._id)} /> </CTableDataCell>
@@ -171,6 +175,23 @@ const HRPolicy = () => {
                             </CTableBody>
                         </CTable>
                     </CCardBody>
+                    <CPagination aria-label="Page navigation example" align="center" className='mt-2'>
+                        <CPaginationItem aria-label="Previous" disabled={paging != 0 ? false : true} onClick={() => paging > 0 && setPaging(paging - 1)}>
+                            <span aria-hidden="true">&laquo;</span>
+                        </CPaginationItem>
+                        <CPaginationItem active onClick={() => setPaging(0)}>{paging + 1}</CPaginationItem>
+                        {result1.filter((list) => list.username === username).length > (paging + 1) * 10 && <CPaginationItem onClick={() => setPaging(paging + 1)} >{paging + 2}</CPaginationItem>}
+
+                        {result1.filter((list) => list.username === username).length > (paging + 2) * 10 && <CPaginationItem onClick={() => setPaging(paging + 2)}>{paging + 3}</CPaginationItem>}
+                        {result1.filter((list) => list.username === username).length > (paging + 1) * 10 ?
+                            <CPaginationItem aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                            : <CPaginationItem disabled aria-label="Next" onClick={() => setPaging(paging + 1)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                        }
+                    </CPagination>
                 </CCard>
             </CCol>
         </CRow>
